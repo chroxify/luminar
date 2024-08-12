@@ -1,0 +1,3 @@
+{
+  "extends": "@feedbase/tsconfig/base.json"
+}

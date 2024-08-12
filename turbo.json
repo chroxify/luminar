@@ -1,7 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env"],
-  "globalDotEnv": [".env"],
+  "globalDependencies": [
+    "**/.env",
+    ".env"
+  ],
   "globalEnv": [
     "NEXT_PUBLIC_SUPABASE_URL",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -18,24 +20,38 @@
     "CUSTOM_DOMAIN_WHITELIST",
     "NODE_ENV"
   ],
-  "pipeline": {
+  "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["GITHUB_CLIENT_ID", "GITHUB_SECRET"]
+      "env": [
+        "GITHUB_CLIENT_ID",
+        "GITHUB_SECRET"
+      ]
     },
     "topo": {
-      "dependsOn": ["^topo"]
+      "dependsOn": [
+        "^topo"
+      ]
     },
     "lint": {
-      "dependsOn": ["topo"]
+      "dependsOn": [
+        "topo"
+      ]
     },
     "ts": {
-      "dependsOn": ["topo"]
+      "dependsOn": [
+        "topo"
+      ]
     }
   }
 }

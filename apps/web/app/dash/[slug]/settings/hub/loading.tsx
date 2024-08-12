@@ -1,4 +1,4 @@
-import { Skeleton } from 'ui/components/ui/skeleton';
+import { Skeleton } from '@feedbase/ui/components/skeleton';
 
 export default function HubLoading() {
   return (

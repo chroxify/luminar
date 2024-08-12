@@ -1,5 +1,5 @@
+import { Label } from '@feedbase/ui/components/label';
 import { HelpCircle } from 'lucide-react';
-import { Label } from 'ui/components/ui/label';
 import DefaultTooltip from './tooltip';
 
 export default function TooltipLabel({ label, tooltip }: { label: string; tooltip: string }) {

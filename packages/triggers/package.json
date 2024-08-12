@@ -1,0 +1,11 @@
+{
+  "name": "@feedbase/triggers",
+  "version": "1.0.0",
+  "dependencies": {
+    "@trigger.dev/sdk": "^2.3.18"
+  },
+  "devDependencies": {
+    "@feedbase/tsconfig": "workspace:*",
+    "typescript": "^5.2.2"
+  }
+}

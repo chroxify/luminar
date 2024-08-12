@@ -15,9 +15,9 @@ import { Feedbase } from '@feedbase/client';
 
 // Create a new Feedbase instance
 const feedbase = new Feedbase(
-  // The slug of your Feedbase project
+  // The slug of your Feedbase workspace
   slug: 'feedbase',
-  // The api key for your Feedbase project
+  // The api key for your Feedbase workspace
   token: 'api-key',
 );
 
@@ -26,7 +26,7 @@ feedbase.submitFeedback(
   // Title
   title: 'This is a title',
   // Description
-  description: 'This is a description',
+  content: 'This is the feedback content',
   // Email
   email: 'user@email.com',
   // Full Name (optional)

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { cn } from '@ui/lib/utils';
+import { cn } from '@feedbase/ui/lib/utils';
 
 export default function BentoCardWrapper({
   className,

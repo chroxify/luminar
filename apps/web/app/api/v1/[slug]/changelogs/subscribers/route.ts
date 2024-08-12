@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { subscribeToProjectChangelogs, unsubscribeFromProjectChangelogs } from '@/lib/api/public';
+import { subscribeToWorkspaceChangelogs, unsubscribeFromWorkspaceChangelogs } from '@/lib/api/public';
 
 /*
-  Subscribe to project changelogs
+  Subscribe to workspace changelogs
   POST /api/v1/:slug/changelogs/subscribers
   {
     email: string,
@@ -16,8 +16,8 @@ export async function POST(req: Request, context: { params: { slug: string } }) 
     return NextResponse.json({ error: 'email is required.' }, { status: 400 });
   }
 
-  // Subscribe to project changelogs
-  const { data: subscriber, error } = await subscribeToProjectChangelogs(context.params.slug, email);
+  // Subscribe to workspace changelogs
+  const { data: subscriber, error } = await subscribeToWorkspaceChangelogs(context.params.slug, email);
 
   // If any errors thrown, return error
   if (error) {
@@ -29,7 +29,7 @@ export async function POST(req: Request, context: { params: { slug: string } }) 
 }
 
 /*
-  Unsubscribe from project changelogs
+  Unsubscribe from workspace changelogs
   DELETE /api/v1/:slug/changelogs/subscribers
   {
     subId: string,
@@ -43,8 +43,8 @@ export async function DELETE(req: Request, context: { params: { slug: string } }
     return NextResponse.json({ error: 'subId is required.' }, { status: 400 });
   }
 
-  // Unsubscribe from project changelogs
-  const { error } = await unsubscribeFromProjectChangelogs(context.params.slug, subId);
+  // Unsubscribe from workspace changelogs
+  const { error } = await unsubscribeFromWorkspaceChangelogs(context.params.slug, subId);
 
   // If any errors thrown, return error
   if (error) {

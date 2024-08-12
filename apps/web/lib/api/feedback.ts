@@ -1,22 +1,23 @@
-import { internal_runWithWaitUntil as waitUntil } from 'next/dist/server/web/internal-edge-wait-until';
-import { withFeedbackAuth, withProjectAuth } from '../auth';
+// import { internal_runWithWaitUntil as waitUntil } from 'next/dist/server/web/internal-edge-wait-until';
+import { withFeedbackAuth, withFeedbackBoardAuth, withWorkspaceAuth } from '../auth';
 import {
   FeedbackProps,
   FeedbackTagProps,
+  FeedbackUpvoter,
   FeedbackWithUserInputProps,
   FeedbackWithUserProps,
   ProfileProps,
 } from '../types';
 import { isValidEmail } from '../utils';
-import { sendDiscordNotification, sendSlackNotification } from './integrations';
 
 // Create a feedback post
 export const createFeedback = (
-  projectSlug: string,
+  boardId: string | undefined,
+  workspaceSlug: string,
   data: FeedbackWithUserInputProps,
   cType: 'server' | 'route'
 ) =>
-  withProjectAuth<FeedbackProps['Row']>(async (user, supabase, project, error) => {
+  withFeedbackBoardAuth<FeedbackProps['Row']>(async (user, supabase, board, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -24,11 +25,11 @@ export const createFeedback = (
 
     // Check if tags exist
     if (data.tags && data.tags.length > 0) {
-      // Get all feedback tags for project
-      const { data: projectTags, error: tagsError } = await supabase
-        .from('feedback_tags')
+      // Get all feedback tags for workspace
+      const { data: workspaceTags, error: tagsError } = await supabase
+        .from('feedback_tag')
         .select()
-        .eq('project_id', project!.id);
+        .eq('workspace_id', board!.workspace_id);
 
       // Check for errors
       if (tagsError) {
@@ -36,8 +37,8 @@ export const createFeedback = (
       }
 
       // If no tags, return error
-      if (!projectTags || projectTags.length === 0) {
-        return { data: null, error: { message: 'no tags found for project.', status: 404 } };
+      if (!workspaceTags || workspaceTags.length === 0) {
+        return { data: null, error: { message: 'no tags found for workspace.', status: 404 } };
       }
 
       // Check if all tags are valid
@@ -46,7 +47,7 @@ export const createFeedback = (
       // Loop through tags
       data.tags.forEach((tag) => {
         // Check if tag exists
-        const tagExists = projectTags.find((t) => t.id === tag);
+        const tagExists = workspaceTags.find((t) => t.id === tag);
 
         // If tag doesn't exist, add to invalid tags
         if (!tagExists) {
@@ -66,13 +67,14 @@ export const createFeedback = (
       }
 
       // Convert tags into raw tags json array objects: [{name: name, color: color}]
-      data.raw_tags = projectTags
+      data.raw_tags = workspaceTags
         .filter((tag) => data.tags!.includes(tag.id))
         .map((tag) => {
           return { name: tag.name, color: tag.color };
         });
     }
 
+    // TODO: This can be removed with supabase anon auth
     // Check if user is not undefined
     if (data.user !== undefined) {
       // Make sure user has email and its an email
@@ -85,7 +87,7 @@ export const createFeedback = (
 
       // Check if user exists
       const { data: userProfile, error: profileError } = await supabase
-        .from('profiles')
+        .from('profile')
         .select()
         .eq('email', data.user.email);
 
@@ -96,7 +98,7 @@ export const createFeedback = (
 
       // Check if widget user email exists
       const { data: widgetUser, error: widgetUserError } = await supabase
-        .from('profiles')
+        .from('profile')
         .select()
         .eq('email', data.user.email.replace('@', '+widget@'));
 
@@ -123,7 +125,7 @@ export const createFeedback = (
           // Update name if it has changed
           if (data.user.full_name !== undefined && widgetUser[0].full_name !== data.user.full_name) {
             const { error: updateError } = await supabase
-              .from('profiles')
+              .from('profile')
               .update({ full_name: data.user.full_name })
               .eq('id', widgetUser[0].id)
               .select()
@@ -139,7 +141,7 @@ export const createFeedback = (
         } else {
           // Create user
           const { data: createdProfile, error: createError } = await supabase
-            .from('profiles')
+            .from('profile')
             .insert({
               email: data.user.email.replace('@', '+widget@'),
               full_name:
@@ -165,7 +167,7 @@ export const createFeedback = (
         // Update name if it has changed
         if (data.user.full_name !== undefined && userProfile[0].full_name !== data.user.full_name) {
           const { error: updateError } = await supabase
-            .from('profiles')
+            .from('profile')
             .update({ full_name: data.user.full_name })
             .eq('id', widgetUser[0].id)
             .select()
@@ -184,7 +186,7 @@ export const createFeedback = (
          * Create new widget user profile
          */
         const { data: createdProfile, error: createError } = await supabase
-          .from('profiles')
+          .from('profile')
           .insert({
             email: userProfile[0].email.replace('@', '+widget@'),
             full_name: userProfile[0].full_name,
@@ -203,8 +205,8 @@ export const createFeedback = (
     }
 
     // Make sure content is not empty or just html tags
-    if (data.description.replace(/<[^>]*>?/gm, '').length === 0) {
-      return { data: null, error: { message: 'feedback description cannot be empty.', status: 400 } };
+    if (data.content.replace(/<[^>]*>?/gm, '').length === 0) {
+      return { data: null, error: { message: 'feedback content cannot be empty.', status: 400 } };
     }
 
     // Insert feedback
@@ -212,10 +214,11 @@ export const createFeedback = (
       .from('feedback')
       .insert({
         title: data.title,
-        description: data.description,
+        content: data.content,
         status: data.status,
         raw_tags: data.raw_tags,
-        project_id: project!.id,
+        board_id: board!.id,
+        workspace_id: board!.workspace_id,
         user_id: data.user !== undefined ? data.user_id : user!.id,
       })
       .select('*, user:user_id (*)')
@@ -226,67 +229,68 @@ export const createFeedback = (
       return { data: null, error: { message: feedbackError.message, status: 500 } };
     }
 
-    // Convert feedback to unknown type and then to test type
-    const feedbackData = feedback as unknown as FeedbackWithUserProps;
+    // TODO: Handle all of this in trigger.dev
+    // Convert feedback to unknown type and then to FeedbackWithUserProps type
+    // const feedbackData = feedback as unknown as FeedbackWithUserProps;
 
-    // Fetch Project Config for integrations
-    const { data: projectConfig, error: projectConfigError } = await supabase
-      .from('project_configs')
-      .select()
-      .eq('project_id', project!.id)
-      .single();
+    // // Fetch Workspace Config for integrations
+    // const { data: workspaceConfig, error: workspaceConfigError } = await supabase
+    //   .from('workspace_config')
+    //   .select()
+    //   .eq('workspace_id', workspace!.id)
+    //   .single();
 
-    // Check for errors
-    if (projectConfigError) {
-      return { data: null, error: { message: projectConfigError.message, status: 500 } };
-    }
+    // // Check for errors
+    // if (workspaceConfigError) {
+    //   return { data: null, error: { message: workspaceConfigError.message, status: 500 } };
+    // }
 
-    //! Note: The waitUntil function is currently a highly experimental api and might break in the future
-    // Once there is a better way to do this, it should be replaced
-    // https://github.com/vercel/next.js/issues/50522#issuecomment-1838593482
+    // //! Note: The waitUntil function is currently a highly experimental api and might break in the future
+    // // Once there is a better way to do this, it should be replaced
+    // // https://github.com/vercel/next.js/issues/50522#issuecomment-1838593482
 
-    // Check if Discord integration is enabled
-    if (projectConfig.integration_discord_status) {
-      // Send Discord notification asynchronously without waiting for it to complete
-      waitUntil(async () => {
-        sendDiscordNotification(feedbackData, project!, projectConfig);
-      });
-    }
+    // // Check if Discord integration is enabled
+    // if (workspaceConfig.integration_discord_status) {
+    //   // Send Discord notification asynchronously without waiting for it to complete
+    //   waitUntil(async () => {
+    //     // sendDiscordNotification(feedbackData, workspace!, workspaceConfig);
+    //   });
+    // }
 
-    // Check if Slack integration is enabled
-    if (projectConfig.integration_slack_status) {
-      // Send Slack notification asynchronously without waiting for it to complete
-      waitUntil(async () => {
-        sendSlackNotification(feedbackData, project!, projectConfig);
-      });
-    }
+    // // Check if Slack integration is enabled
+    // if (workspaceConfig.integration_slack_status) {
+    //   // Send Slack notification asynchronously without waiting for it to complete
+    //   waitUntil(async () => {
+    //     // sendSlackNotification(feedbackData, workspace!, workspaceConfig);
+    //   });
+    // }
 
-    // Create project notification
-    waitUntil(async () => {
-      await supabase
-        .from('notifications')
-        .insert({
-          type: 'post',
-          project_id: project!.id,
-          initiator_id: user!.id,
-          feedback_id: feedbackData.id,
-        })
-        .select()
-        .single();
-    });
+    // // Create workspace notification
+    // waitUntil(async () => {
+    //   await supabase
+    //     .from('notification')
+    //     .insert({
+    //       type: 'post',
+    //       workspace_id: workspace!.id,
+    //       initiator_id: user!.id,
+    //       feedback_id: feedbackData.id,
+    //     })
+    //     .select()
+    //     .single();
+    // });
 
     // Return feedback
     return { data: feedback, error: null };
-  })(projectSlug, cType, true, true);
+  })(boardId, workspaceSlug, cType);
 
 // Update a feedback post
 export const updateFeedbackByID = (
   id: string,
-  projectSlug: string,
+  workspaceSlug: string,
   data: FeedbackWithUserInputProps,
   cType: 'server' | 'route'
 ) =>
-  withFeedbackAuth<FeedbackProps['Row']>(async (user, supabase, feedback, project, error) => {
+  withFeedbackAuth<FeedbackProps['Row']>(async (user, supabase, feedback, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -294,11 +298,11 @@ export const updateFeedbackByID = (
 
     // Check if tags exist
     if (data.tags !== undefined) {
-      // Get all feedback tags for project
-      const { data: projectTags, error: tagsError } = await supabase
-        .from('feedback_tags')
+      // Get all feedback tags for workspace
+      const { data: workspaceTags, error: tagsError } = await supabase
+        .from('feedback_tag')
         .select()
-        .eq('project_id', project!.id);
+        .eq('workspace_id', workspace!.id);
 
       // Check for errors
       if (tagsError) {
@@ -306,8 +310,8 @@ export const updateFeedbackByID = (
       }
 
       // If no tags, return error
-      if (!projectTags || projectTags.length === 0) {
-        return { data: null, error: { message: 'no tags found for project.', status: 404 } };
+      if (!workspaceTags || workspaceTags.length === 0) {
+        return { data: null, error: { message: 'no tags found for workspace.', status: 404 } };
       }
 
       // Check if all tags are valid
@@ -316,7 +320,7 @@ export const updateFeedbackByID = (
       // Loop through tags
       data.tags.forEach((tag) => {
         // Check if tag exists
-        const tagExists = projectTags.find((t) => t.id === tag);
+        const tagExists = workspaceTags.find((t) => t.id === tag);
 
         // If tag doesn't exist, add to invalid tags
         if (!tagExists) {
@@ -336,7 +340,7 @@ export const updateFeedbackByID = (
       }
 
       // Convert tags into raw tags json array objects: [{name: name, color: color}]
-      data.raw_tags = projectTags
+      data.raw_tags = workspaceTags
         .filter((tag) => data.tags!.includes(tag.id))
         .map((tag) => {
           return { name: tag.name, color: tag.color };
@@ -348,9 +352,10 @@ export const updateFeedbackByID = (
       .from('feedback')
       .update({
         title: data.title ? data.title : feedback!.title,
-        description: data.description ? data.description : feedback!.description,
+        content: data.content ? data.content : feedback!.content,
         status: data.status !== undefined ? data.status : feedback!.status,
         raw_tags: data.raw_tags ? data.raw_tags : feedback!.raw_tags,
+        board_id: data.board_id ? data.board_id : feedback!.board_id,
       })
       .eq('id', feedback!.id)
       .select()
@@ -363,11 +368,11 @@ export const updateFeedbackByID = (
 
     // Return feedback
     return { data: updatedFeedback, error: null };
-  })(id, projectSlug, cType);
+  })(id, workspaceSlug, cType);
 
 // Get a feedback post
-export const getFeedbackByID = withFeedbackAuth<FeedbackWithUserProps>(
-  async (user, supabase, feedback, project, error) => {
+export const getFeedbackById = withFeedbackAuth<FeedbackWithUserProps>(
+  async (user, supabase, feedback, board, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -375,7 +380,7 @@ export const getFeedbackByID = withFeedbackAuth<FeedbackWithUserProps>(
 
     // Get upvoters
     const { data: upvoters, error: upvotersError } = await supabase
-      .from('feedback_upvoters')
+      .from('feedback_upvoter')
       .select()
       .eq('feedback_id', feedback!.id);
 
@@ -402,8 +407,8 @@ export const getFeedbackByID = withFeedbackAuth<FeedbackWithUserProps>(
 );
 
 // Delete a feedback post
-export const deleteFeedbackByID = withFeedbackAuth<FeedbackProps['Row']>(
-  async (user, supabase, feedback, project, error) => {
+export const deleteFeedbackById = withFeedbackAuth<FeedbackProps['Row']>(
+  async (user, supabase, feedback, board, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -429,7 +434,7 @@ export const deleteFeedbackByID = withFeedbackAuth<FeedbackProps['Row']>(
 
 // Get feedback upvoters
 export const getFeedbackUpvotersById = withFeedbackAuth<ProfileProps['Row'][]>(
-  async (user, supabase, feedback, project, error) => {
+  async (user, supabase, feedback, board, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -437,8 +442,8 @@ export const getFeedbackUpvotersById = withFeedbackAuth<ProfileProps['Row'][]>(
 
     // Get feedback upvoters
     const { data: upvoters, error: upvotersError } = await supabase
-      .from('feedback_upvoters')
-      .select('profiles (*), created_at')
+      .from('feedback_upvoter')
+      .select('profile (*), created_at')
       .eq('feedback_id', feedback!.id)
       .order('created_at', { ascending: false });
 
@@ -449,7 +454,7 @@ export const getFeedbackUpvotersById = withFeedbackAuth<ProfileProps['Row'][]>(
 
     // Restructure upvoters
     const restructuredData = upvoters.map((item) => {
-      return item.profiles;
+      return item.profile;
     }) as ProfileProps['Row'][];
 
     // Return upvoters
@@ -458,117 +463,83 @@ export const getFeedbackUpvotersById = withFeedbackAuth<ProfileProps['Row'][]>(
 );
 
 // Upvote feedback by ID
-export const upvoteFeedbackByID = (
-  id: string,
-  projectSlug: string,
-  cType: 'server' | 'route',
-  hasUserUpvoted = false,
-  isAnonymous = false
-) =>
-  withFeedbackAuth<FeedbackProps['Row']>(async (user, supabase, feedback, project, error) => {
-    // Set has upvoted
-    let hasUpvoted = hasUserUpvoted;
-
+export const upvoteFeedbackByID = (id: string, workspaceSlug: string, cType: 'server' | 'route') =>
+  withFeedbackAuth<FeedbackUpvoter['Row']>(async (user, supabase, feedback, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
     }
 
-    // Get project config
-    const { data: projectConfig, error: projectConfigError } = await supabase
-      .from('project_configs')
+    // Get workspace module config
+    const { data: workspaceModuleConfig, error: workspaceModuleConfigError } = await supabase
+      .from('workspace_module')
       .select()
-      .eq('project_id', project!.id)
+      .eq('workspace_id', workspace!.id)
       .single();
 
     // Check for errors
-    if (projectConfigError) {
-      return { data: null, error: { message: projectConfigError.message, status: 500 } };
+    if (workspaceModuleConfigError) {
+      return { data: null, error: { message: workspaceModuleConfigError.message, status: 500 } };
     }
 
     // Check if anonymous upvoting is enabled
-    if (!projectConfig.feedback_allow_anon_upvoting && isAnonymous) {
+    if (!workspaceModuleConfig.feedback_anon_upvoting && user!.is_anonymous) {
       return { data: null, error: { message: 'anonymous upvoting is not allowed.', status: 403 } };
     }
 
-    // Upvote for logged in users
-    if (!isAnonymous) {
-      // Get user profile
-      const { data: userProfile, error: profileError } = await supabase
-        .from('profiles')
+    // Check if user has already upvoted
+    const { data: upvoter, error: upvoterError } = await supabase
+      .from('feedback_upvoter')
+      .select()
+      .eq('profile_id', user!.id)
+      .eq('feedback_id', feedback!.id);
+
+    // Check for errors
+    if (upvoterError) {
+      return { data: null, error: { message: upvoterError.message, status: 500 } };
+    }
+
+    // Create upvote
+    if (!upvoter || upvoter.length === 0) {
+      const { data: createdUpvote, error: createError } = await supabase
+        .from('feedback_upvoter')
+        .insert({
+          profile_id: user!.id,
+          feedback_id: feedback!.id,
+        })
         .select()
-        .eq('id', user!.id)
         .single();
 
       // Check for errors
-      if (profileError) {
-        return { data: null, error: { message: profileError.message, status: 500 } };
+      if (createError) {
+        return { data: null, error: { message: createError.message, status: 500 } };
       }
 
-      // Check if user has already upvoted
-      const { data: upvoter, error: upvoterErrorCheck } = await supabase
-        .from('feedback_upvoters')
-        .select()
-        .eq('profile_id', userProfile.id)
-        .eq('feedback_id', feedback!.id);
-
-      // Check for errors
-      if (upvoterErrorCheck) {
-        return { data: null, error: { message: upvoterErrorCheck.message, status: 500 } };
-      }
-
-      // Check if upvoter exists
-      if (upvoter && upvoter.length > 0) {
-        // Delete upvoter
-        const { error: deleteError } = await supabase
-          .from('feedback_upvoters')
-          .delete()
-          .eq('id', upvoter[0].id)
-          .select()
-          .single();
-
-        // Check for errors
-        if (deleteError) {
-          return { data: null, error: { message: deleteError.message, status: 500 } };
-        }
-      } else {
-        // Create upvoter
-        const { error: upvoterError } = await supabase
-          .from('feedback_upvoters')
-          .insert({ profile_id: userProfile.id, feedback_id: feedback!.id })
-          .select()
-          .single();
-
-        // Check for errors
-        if (upvoterError) {
-          return { data: null, error: { message: upvoterError.message, status: 500 } };
-        }
-      }
-
-      // Set has upvoted
-      hasUpvoted = upvoter && upvoter.length > 0;
+      // Return success
+      return { data: createdUpvote, error: null };
     }
 
-    // Update feedback upvotes
-    const { data: updatedFeedback, error: updateError } = await supabase
-      .from('feedback')
-      .update({ upvotes: feedback!.upvotes + (hasUpvoted ? -1 : 1) })
-      .eq('id', feedback!.id)
+    // Delete upvote
+    const { data: deletedUpvote, error: deleteError } = await supabase
+      .from('feedback_upvoter')
+      .delete()
+      .eq('profile_id', user!.id)
+      .eq('feedback_id', feedback!.id)
       .select()
       .single();
 
     // Check for errors
-    if (updateError) {
-      return { data: null, error: { message: updateError.message, status: 500 } };
+    if (deleteError) {
+      return { data: null, error: { message: deleteError.message, status: 500 } };
     }
 
-    // Return feedback
-    return { data: updatedFeedback, error: null };
-  })(id, projectSlug, cType, !isAnonymous);
+    // Return success
+    return { data: deletedUpvote, error: null };
+  })(id, workspaceSlug, cType);
 
-// Get all feedback posts
-export const getAllProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>(
-  async (user, supabase, project, error) => {
+// Get all feedback for a board
+export const getAllBoardFeedback = withFeedbackBoardAuth<FeedbackWithUserProps[]>(
+  async (user, supabase, board, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -577,8 +548,8 @@ export const getAllProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>(
     // Get feedback and also include complete user object
     const { data: feedback, error: feedbackError } = await supabase
       .from('feedback')
-      .select('*, user:user_id (*)')
-      .eq('project_id', project!.id);
+      .select('*, user:user_id (*), board:board_id (*)')
+      .eq('board_id', board!.id);
 
     // Check for errors
     if (feedbackError) {
@@ -587,7 +558,7 @@ export const getAllProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>(
 
     // Get upvoters
     const { data: userUpvotes, error: userUpvotesError } = await supabase
-      .from('feedback_upvoters')
+      .from('feedback_upvoter')
       .select()
       .eq('profile_id', user!.id);
 
@@ -619,13 +590,66 @@ export const getAllProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>(
   }
 );
 
+// Get all feedback
+export const getAllWorkspaceFeedback = withWorkspaceAuth<FeedbackWithUserProps[]>(
+  async (user, supabase, workspace, error) => {
+    // If any errors, return error
+    if (error) {
+      return { data: null, error };
+    }
+
+    // Get all feedback for workspace
+    const { data: feedback, error: feedbackError } = await supabase
+      .from('feedback')
+      .select('*, user:user_id (*), board:board_id (*)')
+      .eq('workspace_id', workspace!.id);
+
+    // Check for errors
+    if (feedbackError) {
+      return { data: null, error: { message: feedbackError.message, status: 500 } };
+    }
+
+    // Convert feedback to unknown type and then to test type
+    const feedbackData = feedback as unknown as FeedbackWithUserProps[];
+
+    // Convert raw tags to tags and remove raw tags
+    feedbackData.forEach((feedback) => {
+      feedback.tags = feedback.raw_tags as unknown as FeedbackTagProps['Row'][];
+    });
+
+    // Get upvoters
+    const { data: userUpvotes, error: userUpvotesError } = await supabase
+      .from('feedback_upvoter')
+      .select()
+      .eq('profile_id', user!.id);
+
+    // Check for errors
+    if (userUpvotesError) {
+      return { data: null, error: { message: userUpvotesError.message, status: 500 } };
+    }
+
+    // Get array of upvoted feedback ids
+    const upvotedFeedbackIds = userUpvotes.map((upvoter) => upvoter.feedback_id);
+
+    // Add has upvoted
+    if (upvotedFeedbackIds.length > 0) {
+      feedbackData.forEach((feedback) => {
+        feedback.has_upvoted = upvotedFeedbackIds.includes(feedback.id);
+      });
+    }
+
+    // Return feedback
+    return { data: feedbackData, error: null };
+  }
+);
+
 // Create feedback tag
 export const createFeedbackTag = (
-  projectSlug: string,
+  workspaceSlug: string,
   data: { name: string; color: string },
   cType: 'server' | 'route'
 ) =>
-  withProjectAuth<FeedbackTagProps['Row']>(async (user, supabase, project, error) => {
+  withWorkspaceAuth<FeedbackTagProps['Row']>(async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -633,9 +657,9 @@ export const createFeedbackTag = (
 
     // Make sure tag doesn't already exist
     const { data: tagExists, error: tagExistsError } = await supabase
-      .from('feedback_tags')
+      .from('feedback_tag')
       .select()
-      .eq('project_id', project!.id)
+      .eq('workspace_id', workspace!.id)
       .eq('name', data.name);
 
     // Check for errors
@@ -650,11 +674,11 @@ export const createFeedbackTag = (
 
     // Create tag
     const { data: tag, error: tagError } = await supabase
-      .from('feedback_tags')
+      .from('feedback_tag')
       .insert({
         name: data.name,
         color: data.color,
-        project_id: project!.id,
+        workspace_id: workspace!.id,
       })
       .select()
       .single();
@@ -666,11 +690,11 @@ export const createFeedbackTag = (
 
     // Return feedback
     return { data: tag, error: null };
-  })(projectSlug, cType);
+  })(workspaceSlug, cType);
 
 // Delete feedback tag by name
-export const deleteFeedbackTagByName = (projectSlug: string, tagName: string, cType: 'server' | 'route') =>
-  withProjectAuth<FeedbackTagProps['Row']>(async (user, supabase, project, error) => {
+export const deleteFeedbackTagByName = (workspaceSlug: string, tagName: string, cType: 'server' | 'route') =>
+  withWorkspaceAuth<FeedbackTagProps['Row']>(async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -678,9 +702,9 @@ export const deleteFeedbackTagByName = (projectSlug: string, tagName: string, cT
 
     // Check if tag exists
     const { data: tag, error: tagError } = await supabase
-      .from('feedback_tags')
+      .from('feedback_tag')
       .select()
-      .eq('project_id', project!.id)
+      .eq('workspace_id', workspace!.id)
       .eq('name', tagName)
       .single();
 
@@ -691,7 +715,7 @@ export const deleteFeedbackTagByName = (projectSlug: string, tagName: string, cT
 
     // Delete tag
     const { data: deletedTag, error: deleteError } = await supabase
-      .from('feedback_tags')
+      .from('feedback_tag')
       .delete()
       .eq('id', tag.id)
       .select()
@@ -704,21 +728,21 @@ export const deleteFeedbackTagByName = (projectSlug: string, tagName: string, cT
 
     // Return success
     return { data: deletedTag, error: null };
-  })(projectSlug, cType);
+  })(workspaceSlug, cType);
 
-// Get all project feedback tags
-export const getAllFeedbackTags = withProjectAuth<FeedbackTagProps['Row'][]>(
-  async (user, supabase, project, error) => {
+// Get all workspace feedback tags
+export const getAllFeedbackTags = withWorkspaceAuth<FeedbackTagProps['Row'][]>(
+  async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
     }
 
-    // Get all feedback tags for project
+    // Get all feedback tags for workspace
     const { data: tags, error: tagsError } = await supabase
-      .from('feedback_tags')
+      .from('feedback_tag')
       .select()
-      .eq('project_id', project!.id);
+      .eq('workspace_id', workspace!.id);
 
     // Check for errors
     if (tagsError) {

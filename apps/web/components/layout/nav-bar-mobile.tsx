@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@ui/lib/utils';
-import { Button } from 'ui/components/ui/button';
-import { NavbarTabProps, ProjectProps } from '@/lib/types';
+import { Button } from '@feedbase/ui/components/button';
+import { cn } from '@feedbase/ui/lib/utils';
+import { SidebarTabProps, SidebarTabsProps, WorkspaceProps } from '@/lib/types';
 import { Icons } from '../shared/icons/icons-static';
 
 const navTabs = [
@@ -38,25 +38,26 @@ const navTabs = [
 
 export default function NavbarMobile({
   tabs,
-  activeTabIndex,
-  currentProject,
+  initialTab,
+  currentWorkspace,
 }: {
-  tabs: NavbarTabProps[];
-  activeTabIndex: number;
-  currentProject: ProjectProps['Row'];
+  tabs: SidebarTabsProps;
+  initialTab: SidebarTabProps;
+  currentWorkspace: WorkspaceProps['Row'];
 }) {
-  const [activeTab, setActiveTab] = useState(activeTabIndex);
+  const [activeTab, setActiveTab] = useState(initialTab.slug);
   const [isPWA, setIsPWA] = useState(false);
   const pathname = usePathname();
 
   // Check current active tab based on url
   useEffect(() => {
     // Check if any of the tab slugs are in the pathname
-    const currentTab = tabs.findIndex((tab) => pathname.split('/')[2] === tab.slug);
+    const rawTabs = Object.values(tabs).flat();
+    const currentTab = rawTabs.findIndex((tab) => pathname.includes(tab.slug));
 
     // If tab is found, set it as active
     if (currentTab !== -1) {
-      setActiveTab(currentTab);
+      setActiveTab(rawTabs[currentTab].slug);
     }
   }, [pathname, tabs]);
 
@@ -77,7 +78,7 @@ export default function NavbarMobile({
       {navTabs.map((tab, index) => (
         // If roadmap, don't link to the page
         <Link
-          href={tab.slug === 'roadmap' ? '#' : `/${currentProject.slug}/${tab.slug}`}
+          href={`/${currentWorkspace.slug}/${tab.slug}`}
           key={tab.slug}
           className='dr h-full w-full p-3 transition-all duration-150 active:scale-[80%]'>
           <Button
@@ -86,7 +87,7 @@ export default function NavbarMobile({
               'items-centerjustify-center h-full w-full gap-1 border border-transparent p-2 hover:bg-transparent'
             )}>
             {/* Icon */}
-            {activeTab === index ? (
+            {activeTab === tab.slug ? (
               <tab.solid className={cn('h-5 w-5 fill-white', tab.slug === 'analytics' ? 'h-7 w-7' : '')} />
             ) : (
               <tab.outline

@@ -1,9 +1,9 @@
 {
-  "extends": "tsconfig/react-library.json",
+  "extends": "@feedbase/tsconfig/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@ui/*": ["./*"]
+      "@feedbase/ui/*": ["./*"]
     }
   },
   "include": ["."],

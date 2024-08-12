@@ -1,3 +1,7 @@
+import { createBrowserClient } from '@supabase/ssr';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { ApiResponse } from './types';
+
 export function isSlugValid(slug: string) {
   // check if slug contains invalid characters
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.exec(slug.toLowerCase())) {
@@ -80,6 +84,29 @@ export async function fetcher<JSON = any>(input: RequestInfo, init?: RequestInit
   if (!res.ok) {
     const error = await res.text();
     const err = new Error(error) as SWRError;
+    err.status = res.status;
+    throw err;
+  }
+
+  return res.json();
+}
+
+// Action fetcher function for SWR
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function actionFetcher<JSON = any>(
+  input: RequestInfo,
+  { arg }: { arg: Record<string, unknown>; method?: 'POST' | 'PUT' | 'PATCH' | 'DELETE' }
+): Promise<JSON> {
+  const requestOptions: RequestInit = {
+    method: (arg.method as string) || 'POST',
+    body: JSON.stringify(arg),
+  };
+
+  const res = await fetch((arg.inputOverride as RequestInfo | URL) || input, requestOptions);
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    const err = new Error(errorData.error) as SWRError;
     err.status = res.status;
     throw err;
   }
@@ -191,5 +218,159 @@ export function isValidUrl(url: string): boolean {
   ) {
     return false;
   }
+  return true;
+}
+
+// format time ago
+export function formatTimeAgo(date: Date): string {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+
+  let interval = seconds / 31536000;
+
+  // Show the date if it's more than 6 months
+  if (interval > 0.5) {
+    return date.toLocaleDateString();
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return `${Math.floor(interval)}mo`;
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return `${Math.floor(interval)}d`;
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return `${Math.floor(interval)}h`;
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return `${Math.floor(interval)}m`;
+  }
+  return `${Math.floor(seconds)}s`;
+}
+
+export async function uploadToSupabaseStorage(
+  supabaseClient: SupabaseClient,
+  bucketName: string,
+  fileName: string,
+  fileData: string | ArrayBuffer | Uint8Array | Blob,
+  contentType: string,
+  unique = false
+): Promise<ApiResponse<string>> {
+  // Check if file already exists
+  const { data: dirFiles } = await supabaseClient.storage
+    .from(bucketName)
+    .list(fileName.split('/').slice(0, -1).join('/'));
+
+  // Check if file with same name, but without the timestamp already exists
+  const fileAlreadyExists =
+    dirFiles?.filter((file) => {
+      const fileNameWithoutTimestamp = fileName.split('/').pop()?.split('.')[0];
+      return fileNameWithoutTimestamp ? file.name.includes(fileNameWithoutTimestamp) : false;
+    }) ?? [];
+
+  // Add timestamp to the file name
+  const fileNameWithStamp = `${fileName.split('.').slice(0, -1)[0]}-${Date.now()}.${fileName
+    .split('.')
+    .pop()}`;
+
+  // If file already exists and unique is true, replace the file instead of uploading a new one
+  if (fileAlreadyExists && fileAlreadyExists.length > 0 && unique) {
+    // Delete the existing file
+    const { error: deleteError } = await supabaseClient.storage
+      .from(bucketName)
+      .remove([`${fileName.split('/').slice(0, -1).join('/')}/${fileAlreadyExists[0].name}`]);
+
+    if (deleteError) {
+      return {
+        data: null,
+        error: {
+          message: deleteError.message,
+          status: 500,
+        },
+      };
+    }
+  }
+
+  const { error: uploadError } = await supabaseClient.storage
+    .from(bucketName)
+    .upload(fileNameWithStamp, fileData, {
+      contentType,
+    });
+
+  if (uploadError) {
+    return {
+      data: null,
+      error: {
+        message: uploadError.message,
+        status: 500,
+      },
+    };
+  }
+
+  // Get the public URL of the uploaded file
+  const { data: publicUrlData } = await supabaseClient.storage
+    .from(bucketName)
+    .getPublicUrl(fileNameWithStamp);
+
+  return {
+    data: publicUrlData?.publicUrl,
+    error: null,
+  };
+}
+
+export async function signInAnonymously() {
+  // Create a new Supabase client
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // Check if user is already logged in
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // If user is already logged in, return
+  if (user) {
+    return { data: user, error: null };
+  }
+
+  // If not, log user in anonymously
+  const { data, error } = await supabase.auth.signInAnonymously();
+
+  return { data, error };
+}
+
+// Function to check if two objects are equal
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function areObjectsEqual(obj1: any, obj2: any): boolean {
+  // Check if the objects are the same reference
+  if (obj1 === obj2) return true;
+
+  // Check if both arguments are objects
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) return false;
+
+  // Get the keys of both objects
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  // Check if the number of keys is different
+  if (keys1.length !== keys2.length) return false;
+
+  // Iterate over the keys and compare the values
+  for (const key of keys1) {
+    const val1 = obj1[key];
+    const val2 = obj2[key];
+
+    // Recursively compare nested objects
+    const areEqual = areObjectsEqual(val1, val2);
+
+    // Return false if the values are not equal
+    if (!areEqual) return false;
+  }
+
+  // If all properties are equal, return true
   return true;
 }

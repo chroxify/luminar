@@ -69,8 +69,8 @@ SQL >
                 uniq(*) as clicks
             FROM click_events
             WHERE
-                project
-                IN {{ Array(project, 'String') }}
+                workspace
+                IN {{ Array(workspace, 'String') }}
                 {% if defined(feedbackId) %}
                     AND feedbackId
                     IN {{ Array(feedbackId, 'String') }}
@@ -101,8 +101,8 @@ SQL >
                 COUNT(DISTINCT sessionId) as visitors
             FROM click_events
             WHERE
-                project
-                IN {{ Array(project, 'String') }}
+                workspace
+                IN {{ Array(workspace, 'String') }}
                 {% if defined(feedbackId) %}
                     AND feedbackId
                     IN {{ Array(feedbackId, 'String') }}

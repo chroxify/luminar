@@ -1,11 +1,11 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getCurrentUser, getUserProjects } from '@/lib/api/user';
+import { getCurrentUser, getUserWorkspaces } from '@/lib/api/user';
 import { DASH_DOMAIN } from '@/lib/constants';
-import InboxPopover from '@/components/layout/inbox-popover';
+import { SidebarTabsProps } from '@/lib/types';
+import DashboardHeader from '@/components/layout/header';
 import NavbarMobile from '@/components/layout/nav-bar-mobile';
 import Sidebar from '@/components/layout/sidebar';
-import TitleProvider from '@/components/layout/title-provider';
 import {
   AnalyticsIcon,
   CalendarIcon,
@@ -13,41 +13,45 @@ import {
   SettingsIcon,
   TagLabelIcon,
 } from '@/components/shared/icons/icons-animated';
-import { Icons } from '@/components/shared/icons/icons-static';
-import UserDropdown from '@/components/shared/user-dropdown';
 
-const tabs = [
-  {
-    name: 'Changelog',
-    icon: TagLabelIcon,
-    slug: 'changelog',
-  },
-  {
-    name: 'Feedback',
-    icon: FeedbackIcon,
-    slug: 'feedback',
-  },
-  {
-    name: 'Roadmap (Soon)',
-    icon: CalendarIcon,
-    slug: 'roadmap',
-  },
-  {
-    name: 'Analytics',
-    icon: AnalyticsIcon,
-    slug: 'analytics',
-  },
-  {
-    name: 'Settings',
-    icon: SettingsIcon,
-    slug: 'settings',
-  },
-];
+const tabs: SidebarTabsProps = {
+  Modules: [
+    {
+      name: 'Changelog',
+      icon: TagLabelIcon,
+      slug: 'changelog',
+    },
+    {
+      name: 'Feedback',
+      icon: FeedbackIcon,
+      slug: 'feedback',
+    },
+    {
+      name: 'Roadmap',
+      icon: CalendarIcon,
+      slug: 'roadmap',
+    },
+  ],
+  Insights: [
+    {
+      name: 'Analytics',
+      icon: AnalyticsIcon,
+      slug: 'analytics',
+    },
+  ],
+  Workspace: [
+    {
+      name: 'Settings',
+      icon: SettingsIcon,
+      slug: 'settings/general',
+    },
+  ],
+};
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Headers
   const headerList = headers();
-  const projectSlug = headerList.get('x-project');
+  const workspaceSlug = headerList.get('x-workspace');
   const pathname = headerList.get('x-pathname');
 
   // Fetch user
@@ -57,67 +61,48 @@ export default async function DashboardLayout({ children }: { children: React.Re
     return redirect(`${DASH_DOMAIN}/login`);
   }
 
-  // Fetch the user's projects
-  const { data: projects } = await getUserProjects('server');
+  // Fetch the user's workspaces
+  const { data: workspaces } = await getUserWorkspaces('server');
 
-  // Check if the user has any projects
-  if (!projects || projects.length === 0) {
+  // Check if the user has any workspaces
+  if (!workspaces || workspaces.length === 0) {
     return redirect(`${DASH_DOMAIN}`);
   }
 
-  // Get the project with the current slug
-  const currentProject = projects.find((project) => project.slug === projectSlug);
+  // Get the workspace with the current slug
+  const currentWorkspace = workspaces.find((workspace) => workspace.slug === workspaceSlug);
 
-  // If currentProject is undefined, redirect to the first project
-  if (!currentProject) {
-    return redirect(`/${projects[0].slug}`);
+  // If currentWorkspace is undefined, redirect to the first workspace
+  if (!currentWorkspace) {
+    return redirect(`/${workspaces[0].slug}`);
   }
 
   // Retrieve the currently active tab
-  const activeTabIndex = tabs.findIndex((tab) => pathname?.includes(tab.slug));
+  const activeTab = Object.values(tabs)
+    .flatMap((tabArray) => tabArray)
+    .find((tab) => pathname?.includes(tab.slug));
 
   return (
-    <main className='bg-root flex min-h-screen w-full min-w-full justify-center overflow-hidden'>
-      <div className='flex h-full w-full flex-col items-center lg:max-w-screen-xl'>
-        {/* Header with logo and hub button */}
-        {/* BUG: Find a way to solve issue of scroll bar getting removed on avatar dialog open */}
-        {/* https://github.com/radix-ui/primitives/discussions/1100 */}
-        <div className='bg-root fixed top-0 z-50 flex h-16 w-full flex-row items-center justify-between overflow-y-auto px-5 lg:max-w-screen-xl'>
-          {/* Logo */}
-          <Icons.LogoText className='fill-foreground hidden h-9 pl-1 md:block' />
-          <TitleProvider
-            tabs={tabs}
-            initialTitle={activeTabIndex === -1 ? '' : tabs[activeTabIndex].name}
-            className='text-2xl font-semibold md:hidden'
-          />
-          <div className='flex flex-row items-center gap-2'>
-            <InboxPopover user={user} />
-            <UserDropdown user={user} />
-          </div>
-        </div>
-        <div className='flex h-full w-full flex-row justify-start p-5 pt-[64px]'>
-          {/* Sidebar */}
-          <Sidebar
-            tabs={tabs}
-            projects={projects}
-            activeTabIndex={activeTabIndex}
-            currentProject={currentProject}
-          />
+    <main className='bg-root flex h-full min-h-screen w-full min-w-full flex-col items-center'>
+      {/* Header with logo and hub button */}
+      {/* BUG: Find a way to solve issue of scroll bar getting removed on avatar dialog open */}
+      {/* https://github.com/radix-ui/primitives/discussions/1100 */}
+      <DashboardHeader user={user} workspaces={workspaces} currentWorkspace={currentWorkspace} />
 
-          {/* Main content */}
-          <div className='flex w-full flex-col items-start justify-start overflow-hidden pb-20 md:pb-0 md:pl-[240px]'>
-            <TitleProvider
-              tabs={tabs}
-              initialTitle={activeTabIndex === -1 ? '' : tabs[activeTabIndex].name}
-              className='hidden text-3xl font-semibold md:block'
-            />
-            {children}
-          </div>
-        </div>
+      {/* Sidebar */}
+      <Sidebar tabs={tabs} initialTab={activeTab || tabs.Modules[0]} />
 
-        {/* Navbar (mobile) */}
-        <NavbarMobile tabs={tabs} activeTabIndex={activeTabIndex} currentProject={currentProject} />
+      {/* Main content */}
+      <div className='absolute right-0 top-14 flex h-[calc(100%-3.5rem)] w-[calc(100%-240px)] flex-col items-start justify-start overflow-auto pb-20 md:pb-0'>
+        {children}
       </div>
+
+      {/* Navbar (mobile) */}
+      <NavbarMobile
+        tabs={tabs}
+        initialTab={activeTab || tabs.Modules[0]}
+        currentWorkspace={currentWorkspace}
+      />
     </main>
   );
 }

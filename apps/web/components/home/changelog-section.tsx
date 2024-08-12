@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Label } from '@ui/components/ui/label';
-import { cn } from '@ui/lib/utils';
+import { Label } from '@feedbase/ui/components/label';
+import { cn } from '@feedbase/ui/lib/utils';
 import { MailIcon, RssIcon } from 'lucide-react';
 import { PROSE_CN } from '@/lib/constants';
 import { formatRootUrl } from '@/lib/utils';
@@ -27,7 +27,7 @@ export default function ChangelogSection() {
         Keep your users in the loop
       </h1>
 
-      <p className='text-foreground/60 mt-2 w-[800px] max-w-full text-center text-sm font-light sm:text-base'>
+      <p className='text-foreground/60 mt-2 w-[800px] max-w-full text-center text-sm  sm:text-base'>
         Feedbase adds a touch of enjoyment to help you keep your users informed through an appealing changelog
         that&apos;s simple to create and distribute.
       </p>
@@ -50,7 +50,7 @@ export default function ChangelogSection() {
           <BentoCardWrapper className='h-[465px] w-full min-w-[350px]'>
             <div className='p-7'>
               <h1 className='text-foreground text-lg font-medium'>OG Image support</h1>
-              <p className='text-foreground/60 mt-2 text-sm font-light'>
+              <p className='text-foreground/60 mt-2 text-sm '>
                 Set OG image for your changelog posts to make them look great when shared on social media.
               </p>
 
@@ -65,13 +65,13 @@ export default function ChangelogSection() {
 
                 <div className='bg-background flex flex-col gap-1.5 rounded-b-md p-3'>
                   {/* url */}
-                  <span className='text-foreground/60 text-sm font-light'>hub.feedbase.app</span>
+                  <span className='text-foreground/60 text-sm '>hub.feedbase.app</span>
 
                   {/* Title */}
                   <span className='text-foreground text-sm font-medium'>OG Image support</span>
 
                   {/* Description */}
-                  <span className='text-foreground/60 text-sm font-light'>
+                  <span className='text-foreground/60 text-sm '>
                     Easily set an OG image for your changelog posts to make them look great when shared on
                     social media.
                   </span>
@@ -84,19 +84,19 @@ export default function ChangelogSection() {
           <BentoCardWrapper className='h-full min-h-[465px] w-full min-w-[350px]'>
             <div className='h-full p-7'>
               <h1 className='text-foreground text-lg font-medium'>Markdown support</h1>
-              <p className='text-foreground/60 mt-2 text-sm font-light'>
+              <p className='text-foreground/60 mt-2 text-sm '>
                 Write changelog posts in markdown and Feedbase will automatically convert it to HTML.
               </p>
 
               {/* Markdown */}
               <div className='mt-5 flex h-[313px] flex-col gap-1.5'>
-                <Label className='text-foreground/60 text-sm font-light'>Editor</Label>
+                <Label className='text-foreground/60 text-sm '>Editor</Label>
                 <div className='flex h-1/2 flex-col gap-1.5 overflow-auto rounded-md border p-3'>
-                  <RichTextEditor content={changelogContent} setContent={setChangelogContent} proseInvert />
+                  <RichTextEditor content={changelogContent} setContent={setChangelogContent} />
                 </div>
 
                 {/* Preview */}
-                <Label className='text-foreground/60 text-sm font-light'>Preview</Label>
+                <Label className='text-foreground/60 text-sm '>Preview</Label>
                 <div
                   className={cn(
                     'flex h-1/2 flex-col justify-start overflow-x-auto rounded-md border px-3 text-sm',
@@ -113,7 +113,7 @@ export default function ChangelogSection() {
         <BentoCardWrapper className='h-full min-h-[465px] w-full min-w-[350px] xl:w-1/3'>
           <div className='p-7'>
             <h1 className='text-foreground text-lg font-medium'>Receive Updates</h1>
-            <p className='text-foreground/60 mt-2 text-sm font-light'>
+            <p className='text-foreground/60 mt-2 text-sm '>
               Users can subscribe to your changelog to automatically get notified when you post an update.
             </p>
 
@@ -128,7 +128,7 @@ export default function ChangelogSection() {
                 {/* Title & Description */}
                 <div className='flex flex-col gap-1.5'>
                   <span className='text-foreground text-sm font-medium'>Twitter</span>
-                  <span className='text-foreground/60 text-sm font-light'>
+                  <span className='text-foreground/60 text-sm '>
                     Account that users can follow to get updates.
                   </span>
                 </div>
@@ -143,9 +143,7 @@ export default function ChangelogSection() {
                 {/* Title & Description */}
                 <div className='flex flex-col gap-1.5'>
                   <span className='text-foreground text-sm font-medium'>Email</span>
-                  <span className='text-foreground/60 text-sm font-light'>
-                    Email that users can subscribe to.
-                  </span>
+                  <span className='text-foreground/60 text-sm '>Email that users can subscribe to.</span>
                 </div>
               </div>
 
@@ -158,14 +156,12 @@ export default function ChangelogSection() {
                 {/* Title & Description */}
                 <div className='flex flex-col gap-1.5'>
                   <span className='text-foreground text-sm font-medium'>RSS</span>
-                  <span className='text-foreground/60 text-sm font-light'>
-                    RSS feed that users can subscribe to.
-                  </span>
+                  <span className='text-foreground/60 text-sm '>RSS feed that users can subscribe to.</span>
                 </div>
               </div>
             </div>
 
-            <span className='text-foreground/60 text-sm font-light'>And much more...</span>
+            <span className='text-foreground/60 text-sm '>And much more...</span>
           </div>
         </BentoCardWrapper>
       </div>

@@ -1,16 +1,6 @@
 .tiptap p.is-editor-empty:first-child::before {
-  color: hsla(210, 40%, 98%, 0.5);
-  font-weight: 200;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
-
-/* Light mode */
-:is(.light .tiptap) p.is-editor-empty:first-child::before {
-  color: hsla(210, 40%, 2%, 0.5);
-  font-weight: 200;
+  color: hsl(var(--muted-foreground));
+  font-weight: 400;
   content: attr(data-placeholder);
   float: left;
   height: 0;

@@ -23,16 +23,16 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
       },
     ],
     paths: {
-      '/{projectSlug}/atom': {
+      '/{workspaceSlug}/atom': {
         get: {
-          description: 'Generate atom feed for project changelog',
-          operationId: 'getProjectChangelogsAtom',
+          description: 'Generate atom feed for workspace changelog',
+          operationId: 'getWorkspaceChangelogsAtom',
           security: [],
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -51,7 +51,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -61,7 +61,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -73,16 +73,16 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/{projectSlug}/changelogs': {
+      '/{workspaceSlug}/changelogs': {
         get: {
-          description: 'Get public project changelogs',
-          operationId: 'getPublicProjectChangelogs',
+          description: 'Get public workspace changelogs',
+          operationId: 'getPublicWorkspaceChangelogs',
           security: [],
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -104,7 +104,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -114,7 +114,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -126,15 +126,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}': {
+      '/workspaces/{workspaceSlug}': {
         get: {
-          description: 'Get a project by slug',
-          operationId: 'getProjectBySlug',
+          description: 'Get a workspace by slug',
+          operationId: 'getWorkspaceBySlug',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -147,13 +147,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: '#/components/schemas/Project',
+                    $ref: '#/components/schemas/Workspace',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -163,7 +163,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -175,13 +175,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         patch: {
-          description: 'Update a project by slug',
-          operationId: 'updateProjectBySlug',
+          description: 'Update a workspace by slug',
+          operationId: 'updateWorkspaceBySlug',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -189,12 +189,12 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           ],
           requestBody: {
-            description: 'Project object that needs to be updated',
+            description: 'Workspace object that needs to be updated',
             required: true,
             content: {
               'application/json': {
                 schema: {
-                  $ref: '#/components/schemas/ProjectUpdate',
+                  $ref: '#/components/schemas/WorkspaceUpdate',
                 },
               },
             },
@@ -205,13 +205,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: '#/components/schemas/Project',
+                    $ref: '#/components/schemas/Workspace',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -221,7 +221,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -233,13 +233,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         delete: {
-          description: 'Delete a project by slug',
-          operationId: 'deleteProjectBySlug',
+          description: 'Delete a workspace by slug',
+          operationId: 'deleteWorkspaceBySlug',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -252,13 +252,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: '#/components/schemas/Project',
+                    $ref: '#/components/schemas/Workspace',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -268,7 +268,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -280,15 +280,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/changelogs': {
+      '/workspaces/{workspaceSlug}/changelogs': {
         get: {
-          description: 'Get all project changelogs',
-          operationId: 'getProjectChangelogs',
+          description: 'Get all workspace changelogs',
+          operationId: 'getWorkspaceChangelogs',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -310,7 +310,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -320,7 +320,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -332,13 +332,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         post: {
-          description: 'Create project changelog',
-          operationId: 'createProjectChangelog',
+          description: 'Create workspace changelog',
+          operationId: 'createWorkspaceChangelog',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -368,7 +368,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -378,7 +378,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -390,15 +390,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/changelogs/{changelogId}': {
+      '/workspaces/{workspaceSlug}/changelogs/{changelogId}': {
         put: {
-          description: 'Update project changelog by id',
-          operationId: 'updateProjectChangelogById',
+          description: 'Update workspace changelog by id',
+          operationId: 'updateWorkspaceChangelogById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -437,21 +437,21 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or changelog id supplied',
+              description: 'Invalid workspace slug or changelog id supplied',
             },
             404: {
-              description: 'Project or changelog not found',
+              description: 'Workspace or changelog not found',
             },
           },
         },
         delete: {
-          description: 'Delete project changelog by id',
-          operationId: 'deleteProjectChangelogById',
+          description: 'Delete workspace changelog by id',
+          operationId: 'deleteWorkspaceChangelogById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -479,23 +479,23 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or changelog id supplied',
+              description: 'Invalid workspace slug or changelog id supplied',
             },
             404: {
-              description: 'Project or changelog not found',
+              description: 'Workspace or changelog not found',
             },
           },
         },
       },
-      '/projects/{projectSlug}/config': {
+      '/workspaces/{workspaceSlug}/config': {
         get: {
-          description: 'Get project config',
-          operationId: 'getProjectConfig',
+          description: 'Get workspace config',
+          operationId: 'getWorkspaceConfig',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -508,13 +508,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: '#/components/schemas/ProjectConfig',
+                    $ref: '#/components/schemas/WorkspaceConfig',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -524,7 +524,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -536,13 +536,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         patch: {
-          description: 'Update project config',
-          operationId: 'updateProjectConfig',
+          description: 'Update workspace config',
+          operationId: 'updateWorkspaceConfig',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -550,13 +550,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           ],
           requestBody: {
-            description: 'Project config object that needs to be updated',
+            description: 'Workspace config object that needs to be updated',
             required: true,
             content: {
               'application/json': {
                 schema: {
                   type: 'object',
-                  $ref: '#/components/schemas/ProjectConfigUpdate',
+                  $ref: '#/components/schemas/WorkspaceConfigUpdate',
                 },
               },
             },
@@ -568,13 +568,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    $ref: '#/components/schemas/ProjectConfig',
+                    $ref: '#/components/schemas/WorkspaceConfig',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -584,7 +584,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -596,15 +596,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback': {
+      '/workspaces/{workspaceSlug}/feedback': {
         get: {
-          description: 'Get all project feedback',
-          operationId: 'getProjectFeedback',
+          description: 'Get all workspace feedback',
+          operationId: 'getWorkspaceFeedback',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -626,7 +626,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -636,7 +636,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -648,13 +648,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         post: {
-          description: 'Create project feedback',
-          operationId: 'createProjectFeedback',
+          description: 'Create workspace feedback',
+          operationId: 'createWorkspaceFeedback',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -684,7 +684,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -694,7 +694,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -706,15 +706,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback/{feedbackId}': {
+      '/workspaces/{workspaceSlug}/feedback/{feedbackId}': {
         get: {
-          description: 'Get project feedback by id',
-          operationId: 'getProjectFeedbackById',
+          description: 'Get workspace feedback by id',
+          operationId: 'getWorkspaceFeedbackById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -742,7 +742,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or feedback id supplied',
+              description: 'Invalid workspace slug or feedback id supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -764,13 +764,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         patch: {
-          description: 'Update project feedback by id',
-          operationId: 'updateProjectFeedbackById',
+          description: 'Update workspace feedback by id',
+          operationId: 'updateWorkspaceFeedbackById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -809,7 +809,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or feedback id supplied',
+              description: 'Invalid workspace slug or feedback id supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -831,13 +831,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         delete: {
-          description: 'Delete project feedback by id',
-          operationId: 'deleteProjectFeedbackById',
+          description: 'Delete workspace feedback by id',
+          operationId: 'deleteWorkspaceFeedbackById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -865,7 +865,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or feedback id supplied',
+              description: 'Invalid workspace slug or feedback id supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -887,15 +887,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback/{feedbackId}/comments': {
+      '/workspaces/{workspaceSlug}/feedback/{feedbackId}/comments': {
         get: {
           description: 'Get feedback comments',
           operationId: 'getFeedbackComments',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -926,7 +926,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or feedback id supplied',
+              description: 'Invalid workspace slug or feedback id supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -936,7 +936,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project or feedback not found',
+              description: 'Workspace or feedback not found',
               content: {
                 'application/json': {
                   schema: {
@@ -948,15 +948,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback/{feedbackId}/comments/{commentId}': {
+      '/workspaces/{workspaceSlug}/feedback/{feedbackId}/comments/{commentId}': {
         delete: {
-          description: 'Delete project feedback comment by id',
-          operationId: 'deleteProjectFeedbackCommentById',
+          description: 'Delete workspace feedback comment by id',
+          operationId: 'deleteWorkspaceFeedbackCommentById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -993,7 +993,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or feedback id supplied',
+              description: 'Invalid workspace slug or feedback id supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1003,7 +1003,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project or feedback not found',
+              description: 'Workspace or feedback not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1015,15 +1015,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback/{feedbackId}/upvotes': {
+      '/workspaces/{workspaceSlug}/feedback/{feedbackId}/upvotes': {
         get: {
           description: 'Get feedback upvoters',
           operationId: 'getFeedbackUpvoters',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1054,7 +1054,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or feedback id supplied',
+              description: 'Invalid workspace slug or feedback id supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1076,15 +1076,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback/tags': {
+      '/workspaces/{workspaceSlug}/feedback/tags': {
         get: {
           description: 'Get feedback tags',
           operationId: 'getFeedbackTags',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1106,7 +1106,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1116,7 +1116,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1132,9 +1132,9 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           operationId: 'createFeedbackTag',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1164,7 +1164,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1174,7 +1174,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1186,15 +1186,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/feedback/tags/{tagName}': {
+      '/workspaces/{workspaceSlug}/feedback/tags/{tagName}': {
         delete: {
           description: 'Delete feedback tag by name',
           operationId: 'deleteFeedbackTagByName',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1222,7 +1222,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             400: {
-              description: 'Invalid project slug or tag name supplied',
+              description: 'Invalid workspace slug or tag name supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1232,7 +1232,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project or tag not found',
+              description: 'Workspace or tag not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1244,15 +1244,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/invites': {
+      '/workspaces/{workspaceSlug}/invites': {
         get: {
-          description: 'List project team invites',
-          operationId: 'getProjectInvites',
+          description: 'List workspace team invites',
+          operationId: 'getWorkspaceInvites',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1267,14 +1267,14 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
                   schema: {
                     type: 'array',
                     items: {
-                      $ref: '#/components/schemas/ExtendedProjectInvite',
+                      $ref: '#/components/schemas/ExtendedWorkspaceInvite',
                     },
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1284,7 +1284,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1296,13 +1296,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
         post: {
-          description: 'Create a project invite',
-          operationId: 'createProjectInvite',
+          description: 'Create a workspace invite',
+          operationId: 'createWorkspaceInvite',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1310,7 +1310,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           ],
           requestBody: {
-            description: 'Project invite object that needs to be created',
+            description: 'Workspace invite object that needs to be created',
             required: true,
             content: {
               'application/json': {
@@ -1331,13 +1331,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: '#/components/schemas/ProjectInvite',
+                    $ref: '#/components/schemas/WorkspaceInvite',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1347,7 +1347,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1359,15 +1359,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/invites/{inviteId}': {
+      '/workspaces/{workspaceSlug}/invites/{inviteId}': {
         delete: {
-          description: 'Delete project invite by id',
-          operationId: 'deleteProjectInviteById',
+          description: 'Delete workspace invite by id',
+          operationId: 'deleteWorkspaceInviteById',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1389,13 +1389,13 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               content: {
                 'application/json': {
                   schema: {
-                    $ref: '#/components/schemas/ProjectInvite',
+                    $ref: '#/components/schemas/WorkspaceInvite',
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1405,7 +1405,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1417,15 +1417,15 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
           },
         },
       },
-      '/projects/{projectSlug}/members': {
+      '/workspaces/{workspaceSlug}/members': {
         get: {
-          description: 'Get project members',
-          operationId: 'getProjectMembers',
+          description: 'Get workspace members',
+          operationId: 'getWorkspaceMembers',
           parameters: [
             {
-              name: 'projectSlug',
+              name: 'workspaceSlug',
               in: 'path',
-              description: 'Project slug',
+              description: 'Workspace slug',
               required: true,
               schema: {
                 type: 'string',
@@ -1441,14 +1441,14 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
                   schema: {
                     type: 'array',
                     items: {
-                      $ref: '#/components/schemas/ProjectMember',
+                      $ref: '#/components/schemas/WorkspaceMember',
                     },
                   },
                 },
               },
             },
             400: {
-              description: 'Invalid project slug supplied',
+              description: 'Invalid workspace slug supplied',
               content: {
                 'application/json': {
                   schema: {
@@ -1458,7 +1458,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               },
             },
             404: {
-              description: 'Project not found',
+              description: 'Workspace not found',
               content: {
                 'application/json': {
                   schema: {
@@ -1473,7 +1473,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
     },
     components: {
       schemas: {
-        Project: {
+        Workspace: {
           type: 'object',
           properties: {
             id: {
@@ -1501,7 +1501,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           },
         },
-        ProjectUpdate: {
+        WorkspaceUpdate: {
           type: 'object',
           properties: {
             name: {
@@ -1528,7 +1528,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -1567,7 +1567,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -1667,14 +1667,14 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           },
         },
-        ProjectConfig: {
+        WorkspaceConfig: {
           type: 'object',
           properties: {
             id: {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -1705,7 +1705,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           },
         },
-        ProjectConfigUpdate: {
+        WorkspaceConfigUpdate: {
           type: 'object',
           properties: {
             changelog_preview_style: {
@@ -1723,7 +1723,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -1759,7 +1759,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -1998,7 +1998,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -2025,14 +2025,14 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           },
         },
-        ProjectInvite: {
+        WorkspaceInvite: {
           type: 'object',
           properties: {
             id: {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
@@ -2052,18 +2052,18 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           },
         },
-        ExtendedProjectInvite: {
+        ExtendedWorkspaceInvite: {
           type: 'object',
           properties: {
             id: {
               type: 'string',
               format: 'uuid',
             },
-            project_id: {
+            workspace_id: {
               type: 'string',
               format: 'uuid',
             },
-            project: {
+            workspace: {
               type: 'object',
               properties: {
                 name: {
@@ -2101,7 +2101,7 @@ export function GET(): NextResponse<OpenAPIV3.Document> {
             },
           },
         },
-        ProjectMember: {
+        WorkspaceMember: {
           type: 'object',
           properties: {
             id: {

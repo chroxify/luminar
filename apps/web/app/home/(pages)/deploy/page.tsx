@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@ui/components/ui/button';
+import { Button } from '@feedbase/ui/components/button';
 import HomeFooter from '@/components/home/footer';
 
 export default function Deploy() {
@@ -9,7 +9,7 @@ export default function Deploy() {
         <h1 className='text-foreground gap-2 text-center text-4xl font-bold leading-tight'>
           Deploy Feedbase to Vercel
         </h1>
-        <p className='text-foreground/60 mt-2 text-center font-light md:w-2/3'>
+        <p className='text-foreground/60 mt-2 text-center  md:w-2/3'>
           You can deploy your own hosted instance of Feedbase to Vercel, for free, in just a few clicks.
         </p>
 
@@ -27,7 +27,7 @@ export default function Deploy() {
                 Create a Supabase project
               </h1>
 
-              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm font-light transition-colors md:w-2/4'>
+              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm  transition-colors md:w-2/4'>
                 Supabase is an open source Firebase alternative. It provides a database, auth, and storage.
               </p>
 
@@ -51,7 +51,7 @@ export default function Deploy() {
                 Fork the Supabase database
               </h1>
 
-              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm font-light transition-colors md:w-2/4'>
+              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm  transition-colors md:w-2/4'>
                 Once you have your Supabase project, you can fork the Feedbase database schemas to your own
                 project.
               </p>
@@ -79,7 +79,7 @@ export default function Deploy() {
                 Prepare your environment variables
               </h1>
 
-              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm font-light transition-colors md:w-2/4'>
+              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm  transition-colors md:w-2/4'>
                 After setting up your Supabase project, check the example configuration to see where you can
                 find the necessary environment variables.
               </p>
@@ -107,7 +107,7 @@ export default function Deploy() {
                 Deploy to Vercel
               </h1>
 
-              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm font-light transition-colors md:w-2/4'>
+              <p className='text-foreground/60 group-hover:text-foreground/70 select-none text-center text-sm  transition-colors md:w-2/4'>
                 Once you have your environment variables, you can deploy to Vercel.
               </p>
 

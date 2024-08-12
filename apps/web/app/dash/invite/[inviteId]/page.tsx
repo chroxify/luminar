@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
-import { getProjectInvite } from '@/lib/api/invites';
+import { getWorkspaceInvite } from '@/lib/api/invite';
 import { getCurrentUser } from '@/lib/api/user';
-import ProjectInviteForm from '@/components/layout/accept-invite-form';
+import WorkspaceInviteForm from '@/components/workspace/accept-invite-form';
 
-export default async function ProjectInvite({ params }: { params: { inviteId: string } }) {
-  const { data: invite, error: inviteError } = await getProjectInvite(params.inviteId, 'server');
+export default async function WorkspaceInvite({ params }: { params: { inviteId: string } }) {
+  const { data: invite, error: inviteError } = await getWorkspaceInvite(params.inviteId, 'server');
 
   if (inviteError) {
     return notFound();
@@ -15,7 +15,7 @@ export default async function ProjectInvite({ params }: { params: { inviteId: st
 
   return (
     <div className='flex min-h-screen items-center justify-center'>
-      <ProjectInviteForm invite={invite} user={user} />
+      <WorkspaceInviteForm invite={invite} user={user} />
     </div>
   );
 }

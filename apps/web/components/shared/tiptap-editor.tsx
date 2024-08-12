@@ -1,36 +1,50 @@
 'use client';
 
 import './placeholder.css';
-import React from 'react';
+import React, { useRef } from 'react';
+import { cn } from '@feedbase/ui/lib/utils';
+import { BulletList } from '@tiptap/extension-bullet-list';
 import { CharacterCount } from '@tiptap/extension-character-count';
+import { CodeBlock } from '@tiptap/extension-code-block';
 import { Highlight } from '@tiptap/extension-highlight';
 import { Link } from '@tiptap/extension-link';
+import { OrderedList } from '@tiptap/extension-ordered-list';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { Typography } from '@tiptap/extension-typography';
-import { AnyExtension, EditorContent, useEditor } from '@tiptap/react';
+import { AnyExtension, Editor, EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
-import { cn } from '@ui/lib/utils';
 
 export default function RichTextEditor({
   content,
   setContent,
   placeholder,
   className,
+  parentClassName,
   characterLimit,
-  proseInvert,
+  editorRef,
 }: {
   content: string;
-  setContent: React.Dispatch<React.SetStateAction<string>>;
+  setContent: React.Dispatch<React.SetStateAction<string>> | ((content: string) => void);
   placeholder?: string;
   className?: string;
+  parentClassName?: string;
   characterLimit?: number;
-  proseInvert?: boolean;
+  editorRef?: React.MutableRefObject<Editor | null>;
 }) {
+  const localEditorRef = useRef<Editor | null>(null);
+
   const editor = useEditor({
     extensions: [
-      StarterKit as AnyExtension,
+      StarterKit.configure({
+        bulletList: false,
+        orderedList: false,
+        codeBlock: false,
+      }) as AnyExtension,
       Highlight,
       Typography,
+      BulletList,
+      OrderedList,
+      CodeBlock,
       Link.configure({
         HTMLAttributes: {
           class: 'cursor-pointer',
@@ -46,7 +60,7 @@ export default function RichTextEditor({
     content,
     editorProps: {
       attributes: {
-        class: `prose prose-sm dark:prose-invert focus:outline-none${proseInvert ? ' prose-invert' : ''}`,
+        class: cn(`prose prose-sm dark:prose-invert focus:outline-none`, className),
       },
     },
     onUpdate: ({ editor }) => {
@@ -54,10 +68,17 @@ export default function RichTextEditor({
     },
   });
 
+  // Set the editor instance to the ref
+  if (editorRef) {
+    editorRef.current = editor;
+  } else {
+    localEditorRef.current = editor;
+  }
+
   return (
     <EditorContent
       editor={editor}
-      className={cn('h-full w-full p-0 text-sm font-light outline-none', className)}
+      className={cn('h-full w-full p-0 text-sm outline-none', parentClassName)}
     />
   );
 }

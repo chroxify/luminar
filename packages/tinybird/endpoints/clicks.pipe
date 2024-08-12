@@ -5,7 +5,7 @@ SQL >
     SELECT COUNT(*)
     FROM click_events
     WHERE
-        project IN {{ Array(project, 'String') }}
+        workspace IN {{ Array(workspace, 'String') }}
         {% if defined(feedbackId) %}
             AND feedbackId IN {{ Array(feedbackId, 'String') }}
         {% end %}

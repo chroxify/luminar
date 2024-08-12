@@ -1,77 +1,127 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+    https://github.com/tailwindlabs/tailwindcss/discussions/2394
+    https://github.com/tailwindlabs/tailwindcss/pull/5732
+*/
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 14px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 50px;
+    background-color: hsl(var(--border) / 1);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--foreground) / 0.15);
+  }
+}
+
 @layer base {
   :root {
     /* App root background */
-    --root-background: 230 35% 3%; /* #000000 */
-
-    /* Utility background (Buttons, inputs, etc) */
-    --background: 230 11% 12%; /* #0A0C10 | #060606*/ 
-    --foreground: 210 40% 98%; /* #D6D6D6 */
-    
-    /* Muted background (Skeletons, Avatar, tabs, etc) */
-    --muted: 230 11% 8%; /* #20242c */
-    --muted-foreground: 215 6% 62%;
- 
-    --popover: 230 35% 3%; /* #0A0C10 */
-    --popover-foreground: 210 40% 98%;
-
-    --card: 230 35% 3%; /* #0A0C10 */
-    --card-foreground: 210 40% 98%;
- 
-    --border: 222 9% 22%; /* #20242c */
-    --input: 222 9% 22%; /* #20242c */
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 230 35% 3%;
-    
-    /* Hover & active backgrounds (Nav buttons, etc) */
-    --secondary: 227 11% 12%; /* #20242c */
-    --secondary-foreground: 210 40% 98%;
-    
-    /* Button background hovers */
-    --accent: 227 11% 15%; /* #20242c */
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    
-    /* Selection & accent color */
-    --highlight: 231 100% 78%;
- 
-    --ring: 230 9% 13%; /* #20242c */
-
-    --radius: 0.5rem;
-  }
- 
-  .light {
-    /* App root background */
-    --root-background: 0 0% 100%; /* #000000 */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --root-background: 0 0% 100%;
+    --background: 210 20% 98%;
+    --foreground: 224 71% 4%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --primary: 224 71% 4%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
+    --secondary: 240 5% 95%;
+    --secondary-foreground: 215 14% 34%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 218 11% 65%;
+    --accent: 240 5% 94%;
+    --accent-foreground: 224 71% 4%;
+    --destructive: 0 79% 63%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
     --highlight: 231 100% 78%;
-    --ring: 240 5.9% 10%;
+    --ring: 216 12% 84%;
+
+    /* Charts */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --radius: 0.55rem;
+  }
+
+  .dark {
+    /* App root background */
+    --root-background: 235 7% 5%;
+
+    /* Utility background (Buttons, inputs, etc) */
+    --background: 230 7% 16%;
+    --foreground: 220 9% 94%;
+
+    /* Muted background (Skeletons, Avatar, tabs, etc) */
+    --muted: 219 6% 12%;
+    --muted-foreground: 219 6% 65%;
+
+    --popover: 235 7% 5%;
+    --popover-foreground: 220 9% 94%;
+
+    --card: 235 7% 5%;
+    --card-foreground: 220 9% 94%;
+
+    --border: 223 7% 19%;
+    --input: 223 6% 22%;
+
+    --primary: 220 9% 94%;
+    --primary-foreground: 240 4% 10%;
+
+    /* Hover & active backgrounds (Nav buttons, etc) */
+    --secondary: 230 7% 16%;
+    --secondary-foreground: 218 7% 80%;
+
+    /* Button background hovers */
+    --accent: 230 7% 18%;
+    --accent-foreground: 220 9% 94%;
+
+    --destructive: 0 79% 63%;
+    --destructive-foreground: 220 9% 94%;
+
+    /* Selection & accent color */
+    --highlight: 231 100% 78%;
+
+    /* Charts */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --ring: 230 9% 13%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;

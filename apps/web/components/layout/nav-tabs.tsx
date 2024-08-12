@@ -2,65 +2,82 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@ui/lib/utils';
-import { Button } from 'ui/components/ui/button';
-import { NavbarTabProps } from '@/lib/types';
+import { useParams, usePathname } from 'next/navigation';
+import { Button } from '@feedbase/ui/components/button';
+import { Label } from '@feedbase/ui/components/label';
+import { cn } from '@feedbase/ui/lib/utils';
+import { SidebarTabProps, SidebarTabsProps } from '@/lib/types';
 import LottiePlayer from '@/components/shared/lottie-player';
 
 export default function NavTabs({
   tabs,
-  initialTabIndex,
-  projectSlug,
+  initialTab,
 }: {
-  tabs: NavbarTabProps[];
-  initialTabIndex: number;
-  projectSlug: string;
+  tabs: SidebarTabsProps;
+  initialTab: SidebarTabProps;
 }) {
-  const [activeTab, setActiveTab] = useState(initialTabIndex);
+  const [activeTab, setActiveTab] = useState(initialTab.slug);
   const [isHover, setIsHover] = useState('');
   const pathname = usePathname();
+  const { slug: workspaceSlug } = useParams<{ slug: string }>();
 
   // Check current active tab based on url
   useEffect(() => {
     // Check if any of the tab slugs are in the pathname
-    const currentTab = tabs.findIndex((tab) => pathname.split('/')[2] === tab.slug);
+    const rawTabs = Object.values(tabs).flat();
+    const currentTab = rawTabs.findIndex((tab) => pathname.includes(tab.slug));
 
     // If tab is found, set it as active
     if (currentTab !== -1) {
-      setActiveTab(currentTab);
+      setActiveTab(rawTabs[currentTab].slug);
     }
   }, [pathname, tabs]);
 
   return (
-    <div className='flex flex-col gap-2'>
-      {tabs.map((tab, index) => (
-        // If roadmap, don't link to the page
-        <Link
-          href={tab.slug === 'roadmap' ? '#' : `/${projectSlug}/${tab.slug}`}
-          key={tab.slug}
-          className={tab.slug === 'feedback' || tab.slug === 'roadmap' ? 'cursor-default' : ''}>
-          <Button
-            variant='secondary'
-            onMouseEnter={() => {
-              setIsHover(tab.slug);
-            }}
-            onMouseLeave={() => {
-              setIsHover('');
-            }}
-            className={cn(
-              'text-foreground/[85%] hover:text-foreground w-full items-center justify-start gap-1 border border-transparent p-1 font-light',
-              activeTab === index && 'bg-secondary text-foreground hover:bg-secondary'
-            )}>
-            {/* Icon */}
-            <div className='flex transform-none flex-row items-center justify-center p-1'>
-              <LottiePlayer lottieSrc={tab.icon} animate={isHover === tab.slug} className='h-5 w-5' />
-            </div>
+    <div className='flex flex-col gap-5'>
+      {Object.keys(tabs).map((key) => (
+        <div key={key} className='flex flex-col gap-1'>
+          <Label className='pb-1 text-xs font-medium'>{key}</Label>
+          {tabs[key].map((tab) => (
+            <Link
+              href={`/${workspaceSlug}/${tab.slug}`}
+              key={tab.slug}
+              className={tab.slug === 'feedback' || tab.slug === 'roadmap' ? 'cursor-default' : ''}>
+              <Button
+                variant='ghost'
+                onMouseEnter={() => {
+                  setIsHover(tab.slug);
+                }}
+                onMouseLeave={() => {
+                  setIsHover('');
+                }}
+                className={cn(
+                  'text-foreground/70 hover:text-foreground w-full items-center justify-start gap-1 border border-transparent p-1',
+                  activeTab === tab.slug && 'bg-secondary text-foreground hover:bg-secondary'
+                )}>
+                {/* Icon */}
+                {tab.icon ? (
+                  <div className='flex transform-none flex-row items-center justify-center p-1'>
+                    <LottiePlayer
+                      lottieSrc={tab.icon}
+                      animate={isHover === tab.slug}
+                      className='h-5 w-5'
+                      initialColor={
+                        activeTab === tab.slug ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.7)'
+                      }
+                      animationColor='hsl(var(--foreground))'
+                    />
+                  </div>
+                ) : (
+                  <div className='flex items-center justify-center p-1'>{tab.customIcon}</div>
+                )}
 
-            {/* Title */}
-            {tab.name}
-          </Button>
-        </Link>
+                {/* Title */}
+                {tab.name}
+              </Button>
+            </Link>
+          ))}
+        </div>
       ))}
     </div>
   );

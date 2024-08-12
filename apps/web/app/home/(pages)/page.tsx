@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Button } from '@ui/components/ui/button';
+import { Background } from '@feedbase/ui/components/background/background';
+import { Button } from '@feedbase/ui/components/button';
 import { ArrowRight, ChevronRight } from 'lucide-react';
-import { Background } from 'ui/components/ui/background/background';
 import { formatRootUrl } from '@/lib/utils';
 import ChangelogSection from '@/components/home/changelog-section';
 import DashboardSection from '@/components/home/dashboard-section';
@@ -27,7 +27,7 @@ export default function Landing() {
           <span>in One Central Place</span>
         </h1>
 
-        <p className='text-foreground/60 mt-5 max-w-xs text-center text-sm font-light sm:block sm:max-w-lg sm:text-lg md:max-w-xl'>
+        <p className='text-foreground/60 mt-5 max-w-xs text-center text-sm  sm:block sm:max-w-lg sm:text-lg md:max-w-xl'>
           Feedbase simplifies feedback collection, feature prioritization, and product update sharing,
           allowing you to focus on building.
         </p>
@@ -39,7 +39,7 @@ export default function Landing() {
 
           <Link href='/github'>
             <button
-              className='hover:animate-background-shine text-foreground inline-flex h-9 items-center justify-center rounded-full border bg-[linear-gradient(110deg,#06060A,90%,#1e2631,95%,#06060A)] bg-[length:225%_100%] px-4 py-1 text-sm font-light transition-colors'
+              className='hover:animate-background-shine text-foreground inline-flex h-9 items-center justify-center rounded-full border bg-[linear-gradient(110deg,#06060A,90%,#1e2631,95%,#06060A)] bg-[length:225%_100%] px-4 py-1 text-sm  transition-colors'
               type='button'>
               Star on GitHub
             </button>
@@ -48,7 +48,7 @@ export default function Landing() {
 
         <Link
           href={formatRootUrl('hub')}
-          className='text-foreground/60 hover:text-foreground/90 group relative mt-4 flex w-fit flex-row items-center justify-center p-1 text-center text-sm font-light'>
+          className='text-foreground/60 hover:text-foreground/90 group relative mt-4 flex w-fit flex-row items-center justify-center p-1 text-center text-sm '>
           <p className='mr-1 '>See it in action</p>
           <ArrowRight className='relative mb-[1px] inline h-4 w-0 transition-all group-hover:w-4' />
           <ChevronRight className='relative mb-[1px] inline h-4 w-4 transition-all group-hover:w-0' />
@@ -73,7 +73,7 @@ export default function Landing() {
           Create your feedback
           <br /> community today.
         </h1>
-        <p className='text-foreground/60 mt-5 w-full text-center text-sm font-light sm:text-lg'>
+        <p className='text-foreground/60 mt-5 w-full text-center text-sm  sm:text-lg'>
           Capture feedback, post updates, and engage
           <br /> with your users in one central place.
         </p>

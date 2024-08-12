@@ -1,7 +1,7 @@
 export interface Changelog {
   id: string;
   author_id: string;
-  project_id: string;
+  workspace_id: string;
   slug: string;
   title: string;
   summary: string | null;

@@ -1,3 +1,3 @@
 module.exports = {
-  extends: ['custom/react-internal'],
+  extends: ['@feedbase/eslint-config/react-internal.js'],
 };

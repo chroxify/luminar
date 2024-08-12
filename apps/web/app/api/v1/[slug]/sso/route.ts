@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { JwtPayload, verify } from 'jsonwebtoken';
-import { getProjectBySlug } from '@/lib/api/projects';
+import { getWorkspaceBySlug } from '@/lib/api/workspace';
 
 export async function GET(req: NextRequest, context: { params: { slug: string } }) {
   const redirectTo = req.nextUrl.searchParams.get('redirect_to');
@@ -18,33 +18,33 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
 
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-  // Get project by slug
-  const { data: project, error: projectError } = await getProjectBySlug(
+  // Get workspace by slug
+  const { data: workspace, error: workspaceError } = await getWorkspaceBySlug(
     context.params.slug,
     'route',
     true,
     false
   );
 
-  if (projectError) {
-    return NextResponse.json(projectError, { status: 500 });
+  if (workspaceError) {
+    return NextResponse.json(workspaceError, { status: 500 });
   }
 
-  // Get projects jwt secret
-  const { data: projectConfig, error: projectConfigError } = await supabase
-    .from('project_configs')
+  // Get workspaces jwt secret
+  const { data: workspaceConfig, error: workspaceConfigError } = await supabase
+    .from('workspace_configs')
     .select('integration_sso_secret')
-    .eq('project_id', project.id)
+    .eq('workspace_id', workspace.id)
     .single();
 
-  if (projectConfigError) {
-    return NextResponse.json(projectConfigError.message, { status: 500 });
+  if (workspaceConfigError) {
+    return NextResponse.json(workspaceConfigError.message, { status: 500 });
   }
 
   // Verify jwt
   let payload: JwtPayload;
   try {
-    const decoded = verify(jwtPayload, projectConfig?.integration_sso_secret as string);
+    const decoded = verify(jwtPayload, workspaceConfig?.integration_sso_secret as string);
     payload = decoded as JwtPayload;
   } catch (error) {
     if (error instanceof Error) {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
     return NextResponse.json({ error: 'Invalid payload' }, { status: 500 });
   }
 
-  const email = (payload.email as string).replace('@', `+${project.id}@`);
+  const email = (payload.email as string).replace('@', `+${workspace.id}@`);
 
   // Create user based on jwt payload
   const { error } = await supabase.auth.admin.createUser({

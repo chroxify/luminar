@@ -1,4 +1,4 @@
-import { cn } from '@ui/lib/utils';
+import { cn } from '@feedbase/ui/lib/utils';
 import { Icons } from '@/components/shared/icons/icons-static';
 
 export default function LogoProvider({ className }: { className?: string }) {

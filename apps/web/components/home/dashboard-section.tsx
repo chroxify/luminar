@@ -1,20 +1,21 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Button } from '@ui/components/ui/button';
-import { Input } from '@ui/components/ui/input';
-import { Label } from '@ui/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@ui/components/ui/radio-group';
-import { cn } from '@ui/lib/utils';
-import { MoreVertical } from 'lucide-react';
-import { toast } from 'sonner';
-import { Avatar, AvatarFallback, AvatarImage } from 'ui/components/ui/avatar';
+import Image from 'next/image';
+import { Avatar, AvatarFallback, AvatarImage } from '@feedbase/ui/components/avatar';
+import { Button } from '@feedbase/ui/components/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from 'ui/components/ui/dropdown-menu';
+} from '@feedbase/ui/components/dropdown-menu';
+import { Input } from '@feedbase/ui/components/input';
+import { Label } from '@feedbase/ui/components/label';
+import { RadioGroup, RadioGroupItem } from '@feedbase/ui/components/radio-group';
+import { cn } from '@feedbase/ui/lib/utils';
+import { MoreVertical } from 'lucide-react';
+import { toast } from 'sonner';
 import BentoCardWrapper from '@/components/home/spotlight-card';
 import { Icons } from '../shared/icons/icons-static';
 
@@ -63,7 +64,7 @@ export default function DashboardSection() {
         Have full control from a single dashboard
       </h1>
 
-      <p className='text-foreground/60 mt-2 w-[800px] max-w-full text-center text-sm font-light sm:text-base'>
+      <p className='text-foreground/60 mt-2 w-[800px] max-w-full text-center text-sm  sm:text-base'>
         Enhance your workflow from a centralized dashboard - analyze feedback, prepare updates, respond to
         user inquiries, and more!
       </p>
@@ -75,14 +76,14 @@ export default function DashboardSection() {
           <BentoCardWrapper className='h-[295px] w-full min-w-[350px]'>
             <div className='p-7'>
               <h1 className='text-lg font-medium text-white'>Fully customizable</h1>
-              <p className='mt-2 text-sm font-light text-white/60'>
+              <p className='mt-2 text-sm  text-white/60'>
                 Customize your hub to reflect your brand&apos;s unique identity and style.
               </p>
 
-              {/* Project Logo */}
+              {/* Workspace Logo */}
               <div className='mt-2 flex h-full w-full flex-row items-center justify-between'>
                 <div className='space-y-1'>
-                  <Label className='text-foreground/70 text-sm font-light'>Logo</Label>
+                  <Label className='text-foreground/70 text-sm '>Logo</Label>
 
                   {/* File Upload */}
                   <div className='group flex h-[65px] w-[65px] items-center justify-center transition-all'>
@@ -97,7 +98,7 @@ export default function DashboardSection() {
                       </p>
 
                       {logo.url ? (
-                        <img
+                        <Image
                           src={logo.url}
                           alt='Preview'
                           width={45}
@@ -119,7 +120,7 @@ export default function DashboardSection() {
 
                 {/* Logo Radius */}
                 <div className='space-y-1 pt-1'>
-                  <Label className='text-foreground/70 text-sm font-light'>Logo Radius</Label>
+                  <Label className='text-foreground/70 text-sm '>Logo Radius</Label>
 
                   <RadioGroup
                     defaultValue='rounded-md'
@@ -145,9 +146,9 @@ export default function DashboardSection() {
 
                 {/* Color */}
                 <div className='space-y-1 pt-1'>
-                  <Label className='text-foreground/70 text-sm font-light'>Theme</Label>
+                  <Label className='text-foreground/70 text-sm '>Theme</Label>
 
-                  <div className='bg-background focus-within:ring-ring ring-offset-root flex h-8 w-full max-w-[125px] rounded-md border text-sm font-extralight transition-shadow duration-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1'>
+                  <div className='bg-background focus-within:ring-ring ring-offset-root flex h-8 w-full max-w-[125px] rounded-md border text-sm font-light transition-shadow duration-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1'>
                     <div
                       className={cn(
                         'text-foreground/50 bg-accent flex select-none items-center justify-center rounded-l-md border-r',
@@ -180,7 +181,7 @@ export default function DashboardSection() {
                       }}
                     />
                   </div>
-                  <div className='bg-background focus-within:ring-ring ring-offset-root flex h-8 w-full max-w-[125px] rounded-md border text-sm font-extralight transition-shadow duration-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1'>
+                  <div className='bg-background focus-within:ring-ring ring-offset-root flex h-8 w-full max-w-[125px] rounded-md border text-sm font-light transition-shadow duration-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-1'>
                     <div
                       className={cn(
                         'text-foreground/50 bg-accent flex select-none items-center justify-center rounded-l-md border-r',
@@ -251,12 +252,12 @@ export default function DashboardSection() {
           <BentoCardWrapper className='h-[295px] w-full min-w-[350px]'>
             <div className='h-full w-full p-7'>
               <h1 className='text-lg font-medium text-white'>Teams</h1>
-              <p className='mt-2 text-sm font-light text-white/60'>
+              <p className='mt-2 text-sm  text-white/60'>
                 Invite your team members for seamless collaborative hub management.
               </p>
 
               <div className='mt-3 space-y-1'>
-                <Label className='text-foreground/70 text-sm font-light'>Email</Label>
+                <Label className='text-foreground/70 text-sm '>Email</Label>
                 <Input
                   className=''
                   placeholder='Email'
@@ -265,7 +266,7 @@ export default function DashboardSection() {
                     setMail(e.target.value);
                   }}
                 />
-                <Label className='text-foreground/50 text-xs font-extralight'>
+                <Label className='text-foreground/50 text-xs font-light'>
                   Your team member&apos;s email address.
                 </Label>
               </div>
@@ -311,7 +312,7 @@ export default function DashboardSection() {
         <BentoCardWrapper className='h-full min-h-[295px] w-full min-w-[350px] xl:w-1/3'>
           <div className='p-7'>
             <h1 className='text-lg font-medium text-white'>Integrations</h1>
-            <p className='mt-2 text-sm font-light text-white/60'>
+            <p className='mt-2 text-sm  text-white/60'>
               Connect your favorite tools for maximum productivity.
             </p>
 
@@ -327,8 +328,7 @@ export default function DashboardSection() {
                 <div className='flex flex-col'>
                   <span className='text-foreground/70 text-sm'>Linear</span>
 
-                  <span
-                    className={cn('text-foreground/50 text-xs font-light', connected && 'text-green-500')}>
+                  <span className={cn('text-foreground/50 text-xs ', connected && 'text-green-500')}>
                     {connected ? 'Connected' : 'Issue Tracking'}
                   </span>
                 </div>
@@ -353,7 +353,7 @@ export default function DashboardSection() {
               <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger asChild className={cn(!connected && 'hidden')}>
                   <Button
-                    variant='secondary'
+                    variant='ghost'
                     size='icon'
                     className='text-foreground/50 hover:text-foreground h-8 w-5'>
                     <MoreVertical className='h-5 w-5' />
@@ -392,7 +392,7 @@ export default function DashboardSection() {
                 <div className='flex flex-col'>
                   <span className='text-foreground/70 text-sm'>GitHub</span>
 
-                  <span className='text-foreground/50 text-xs font-light'>Version Control</span>
+                  <span className='text-foreground/50 text-xs '>Version Control</span>
                 </div>
               </div>
 

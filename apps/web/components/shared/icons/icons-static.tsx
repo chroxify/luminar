@@ -1,6 +1,19 @@
 type IconProps = React.HTMLAttributes<SVGElement>;
 
 export const Icons = {
+  Logo: (props: IconProps) => (
+    <svg
+      width='192'
+      height='192'
+      viewBox='0 0 192 192'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}>
+      <rect x='58' y='47' width='76.6256' height='25.4074' rx='12.7037' />
+      <path d='M58 98.0167C58 91.0006 63.6876 85.313 70.7037 85.313H104.984C112 85.313 117.687 91.0006 117.687 98.0167C117.687 105.033 112 110.72 104.984 110.72H70.7037C63.6876 110.72 58 105.033 58 98.0167Z' />
+      <path d='M70.7037 145C63.6876 145 58 139.312 58 132.296L58 98.0164C58 91.0004 63.6876 85.3127 70.7037 85.3127C77.7198 85.3127 83.4074 91.0004 83.4074 98.0164L83.4074 132.296C83.4074 139.312 77.7198 145 70.7037 145Z' />
+    </svg>
+  ),
   LogoText: (props: IconProps) => (
     <svg
       width='107'
@@ -31,19 +44,53 @@ export const Icons = {
       <path d='M1920 311.856c-70.701 33.769-146.598 56.47-226.221 66.86 81.317-52.517 143.774-135.529 173.252-234.691-76.236 48.678-160.716 84.028-250.391 103.002-71.718-82.56-174.268-134.06-287.435-134.06-217.75 0-394.165 189.966-394.165 424.206 0 33.318 3.614 65.619 10.165 96.678C617.9 616.119 327.304 447.385 133.045 190.67c-33.77 62.57-53.309 135.53-53.309 213.233 0 147.162 91.031 276.818 196.744 353.054-64.602-2.26-157.101-21.46-157.101-53.309v5.648c0 205.327 114.41 376.658 294.55 415.849-32.978 9.487-78.38 14.795-114.409 14.795-25.412 0-55.454-2.71-79.624-7.793 50.26 168.509 193.13 291.163 365.478 294.777-134.852 113.506-306.07 181.383-490.616 181.383-31.85 0-64.038-2.033-94.758-5.873 174.494 120.17 381.176 190.532 603.67 190.532 724.97 0 1121.055-646.136 1121.055-1206.55 0-18.41-.452-36.932-1.356-55.116 77.026-59.746 143.887-134.4 196.631-219.444' />
     </svg>
   ),
+  Sparkles: (props: IconProps) => (
+    <svg
+      data-testid='geist-icon'
+      height='16'
+      strokeLinejoin='round'
+      viewBox='0 0 16 16'
+      width='16'
+      {...props}>
+      <path
+        d='M2.5 0.5V0H3.5V0.5C3.5 1.60457 4.39543 2.5 5.5 2.5H6V3V3.5H5.5C4.39543 3.5 3.5 4.39543 3.5 5.5V6H3H2.5V5.5C2.5 4.39543 1.60457 3.5 0.5 3.5H0V3V2.5H0.5C1.60457 2.5 2.5 1.60457 2.5 0.5Z'
+        fill='currentColor'
+      />
+      <path
+        d='M14.5 4.5V5H13.5V4.5C13.5 3.94772 13.0523 3.5 12.5 3.5H12V3V2.5H12.5C13.0523 2.5 13.5 2.05228 13.5 1.5V1H14H14.5V1.5C14.5 2.05228 14.9477 2.5 15.5 2.5H16V3V3.5H15.5C14.9477 3.5 14.5 3.94772 14.5 4.5Z'
+        fill='currentColor'
+      />
+      <path
+        d='M8.40706 4.92939L8.5 4H9.5L9.59294 4.92939C9.82973 7.29734 11.7027 9.17027 14.0706 9.40706L15 9.5V10.5L14.0706 10.5929C11.7027 10.8297 9.82973 12.7027 9.59294 15.0706L9.5 16H8.5L8.40706 15.0706C8.17027 12.7027 6.29734 10.8297 3.92939 10.5929L3 10.5V9.5L3.92939 9.40706C6.29734 9.17027 8.17027 7.29734 8.40706 4.92939Z'
+        fill='currentColor'
+      />
+    </svg>
+  ),
   Spinner: (props: IconProps) => (
     <svg
-      xmlns='http://www.w3.org/2000/svg'
-      width='24'
-      height='24'
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
+      data-testid='geist-icon'
+      height='16'
       strokeLinejoin='round'
+      viewBox='0 0 16 16'
+      width='16'
       {...props}>
-      <path d='M21 12a9 9 0 1 1-6.219-8.56' />
+      <g clip-path='url(#clip0_2393_1490)'>
+        <path d='M8 0V4' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.5' d='M8 16V12' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.9' d='M3.29773 1.52783L5.64887 4.7639' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.1' d='M12.7023 1.52783L10.3511 4.7639' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.4' d='M12.7023 14.472L10.3511 11.236' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.6' d='M3.29773 14.472L5.64887 11.236' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.2' d='M15.6085 5.52783L11.8043 6.7639' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.7' d='M0.391602 10.472L4.19583 9.23598' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.3' d='M15.6085 10.4722L11.8043 9.2361' stroke='currentColor' strokeWidth='1.5' />
+        <path opacity='0.8' d='M0.391602 5.52783L4.19583 6.7639' stroke='currentColor' strokeWidth='1.5' />
+      </g>
+      <defs>
+        <clipPath id='clip0_2393_1490'>
+          <rect width='16' height='16' fill='white' />
+        </clipPath>
+      </defs>
     </svg>
   ),
   Chat: (props: IconProps) => (

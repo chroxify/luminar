@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { cn } from '@ui/lib/utils';
-import { MenuIcon } from 'lucide-react';
-import { Button } from 'ui/components/ui/button';
+import { Button } from '@feedbase/ui/components/button';
 import {
   Sheet,
   SheetClose,
@@ -11,7 +9,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from 'ui/components/ui/sheet';
+} from '@feedbase/ui/components/sheet';
+import { cn } from '@feedbase/ui/lib/utils';
+import { MenuIcon } from 'lucide-react';
 import useScroll from '@/lib/hooks/use-scroll';
 import { formatRootUrl } from '@/lib/utils';
 import { Icons } from '@/components/shared/icons/icons-static';
@@ -55,7 +55,7 @@ export default function HomeNav() {
           {navTabs.map((tab) => (
             <Link
               href={tab.href}
-              className='text-foreground/80 hover:border-border hover:bg-foreground/5 flex h-8 items-center justify-center rounded-full border border-transparent px-3 text-sm font-light transition-all'
+              className='text-foreground/80 hover:border-border hover:bg-foreground/5 flex h-8 items-center justify-center rounded-full border border-transparent px-3 text-sm  transition-all'
               key={tab.label.toLowerCase()}>
               {tab.label}
             </Link>
@@ -71,7 +71,7 @@ export default function HomeNav() {
           {navTabs.map((tab) => (
             <Link
               href={tab.href}
-              className='text-foreground/80 hover:border-border hover:bg-foreground/5 flex h-8 items-center justify-center rounded-full border border-transparent px-3 text-sm font-light transition-all'
+              className='text-foreground/80 hover:border-border hover:bg-foreground/5 flex h-8 items-center justify-center rounded-full border border-transparent px-3 text-sm  transition-all'
               key={tab.label.toLowerCase()}>
               {tab.label}
             </Link>
@@ -111,9 +111,7 @@ export default function HomeNav() {
               <div className='-ml-3 flex flex-col items-start justify-start gap-2'>
                 {navTabs.map((tab) => (
                   <SheetClose key={tab.label.toLowerCase()} asChild>
-                    <Link
-                      href={tab.href}
-                      className='text-foreground/80 flex h-8 items-center px-3 text-sm font-light'>
+                    <Link href={tab.href} className='text-foreground/80 flex h-8 items-center px-3 text-sm '>
                       {tab.label}
                     </Link>
                   </SheetClose>

@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation';
-import { getUserProjects } from '@/lib/api/user';
-import Onboarding from '@/components/layout/onboarding';
+import { getUserWorkspaces } from '@/lib/api/user';
+import Onboarding from '@/components/workspace/onboarding';
+import WorkspaceOverview from '@/components/workspace/workspace-overview';
 
-export default async function Projects() {
-  const { data: projects, error } = await getUserProjects('server');
+export default async function Workspaces() {
+  const { data: workspaces, error } = await getUserWorkspaces('server');
 
   if (error) {
     // Redirect to login if the user is not authenticated
@@ -14,15 +15,10 @@ export default async function Projects() {
     return <div>{error.message}</div>;
   }
 
-  // Redirect to the first project
-  if (projects.length > 0) {
-    return redirect(`/${projects[0].slug}`);
-  }
-
-  // TODO: Improve this and make this redirect to an onboarding page if the user has no projects
+  // TODO: Improve this and make this redirect to an onboarding page if the user has no workspaces
   return (
     <div className='flex h-screen w-full items-center justify-center'>
-      <Onboarding />
+      {workspaces && workspaces.length > 0 ? <WorkspaceOverview workspaces={workspaces} /> : <Onboarding />}
     </div>
   );
 }

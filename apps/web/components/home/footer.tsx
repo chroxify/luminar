@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { cn } from '@ui/lib/utils';
+import { cn } from '@feedbase/ui/lib/utils';
 import { formatRootUrl } from '@/lib/utils';
 import { Icons } from '../shared/icons/icons-static';
 import { navTabs } from './header';
@@ -34,7 +34,7 @@ export default function HomeFooter({ fixed }: { fixed?: boolean }) {
           {navTabs.map((tab) => (
             <Link
               href={tab.href}
-              className='text-foreground/70 hover:text-foreground/90 text-sm font-light transition duration-200 ease-in-out'
+              className='text-foreground/70 hover:text-foreground/90 text-sm  transition duration-200 ease-in-out'
               key={tab.label.toLowerCase()}>
               {tab.label}
             </Link>
@@ -42,7 +42,7 @@ export default function HomeFooter({ fixed }: { fixed?: boolean }) {
         </div>
 
         {/* Name */}
-        <div className='text-foreground/60 hidden flex-row items-center justify-center gap-5 text-sm font-light md:flex'>
+        <div className='text-foreground/60 hidden flex-row items-center justify-center gap-5 text-sm  md:flex'>
           © {new Date().getFullYear()} Feedbase
         </div>
       </div>

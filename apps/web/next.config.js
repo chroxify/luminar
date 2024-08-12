@@ -14,7 +14,7 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['ui'],
+  transpilePackages: ['@feedbase/ui'],
   output: 'standalone',
   images: {
     remotePatterns: [
@@ -28,9 +28,17 @@ const nextConfig = {
         protocol: hostPath[0],
         hostname: hostPath[1].replace('//', ''),
         port: hostPath[2],
-        pathname: '/storage/v1/object/public/projects/**',
+        pathname: '/storage/v1/object/public/workspaces/**',
       },
     ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/:slug/board/:id',
+        destination: '/:slug',
+      },
+    ];
   },
 };
 

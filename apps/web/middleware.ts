@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { PostgrestError } from '@supabase/supabase-js';
+import { Database } from './lib/supabase';
 
 export const config = {
   matcher: [
@@ -18,7 +18,7 @@ export const config = {
 
 export default async function middleware(req: NextRequest) {
   // Create a Supabase client configured to use cookies
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -75,28 +75,28 @@ export default async function middleware(req: NextRequest) {
     ? `${hostname.split('.').slice(-2).join('.')}`
     : null;
 
-  // If the request is for a custom domain, rewrite to project paths
+  // If the request is for a custom domain, rewrite to workspace paths
   if (
     rootDomain !== process.env.NEXT_PUBLIC_ROOT_DOMAIN ||
     process.env.CUSTOM_DOMAIN_WHITELIST?.split(',').includes(hostname)
   ) {
-    // Retrieve the project from the database
-    const { data, error } = (await supabase
-      .from('project_configs')
-      .select('project:project_id (slug)')
+    // Retrieve the workspace from the database
+    const { data: workspace, error } = await supabase
+      .from('workspace')
+      .select()
       .eq('custom_domain', hostname)
       .eq('custom_domain_verified', true)
-      .single()) as { data: { project: { slug: string } } | null; error: PostgrestError | null };
+      .single();
 
-    // If the project doesn't exist, return 404
-    if (error || !data) {
+    // If the workspace doesn't exist, return 404
+    if (error || !workspace) {
       return NextResponse.next();
     }
 
-    // If the project exists, rewrite the request to the project's folder
+    // If the workspace exists, rewrite the request to the workspace's folder
     return NextResponse.rewrite(
       new URL(
-        `/${data?.project?.slug}${path}${
+        `/${workspace.slug}${path}${
           req.nextUrl.searchParams ? `?${req.nextUrl.searchParams.toString()}` : ''
         }`,
         req.url
@@ -104,7 +104,7 @@ export default async function middleware(req: NextRequest) {
       {
         headers: {
           'x-pathname': path,
-          'x-project': data?.project?.slug,
+          'x-workspace': workspace.slug,
           'x-powered-by': 'Feedbase',
         },
       }
@@ -126,7 +126,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(new URL(`/dash${path === '/' ? '' : path}`, req.url), {
       headers: {
         'x-pathname': path,
-        'x-project': path.split('/')[1],
+        'x-workspace': path.split('/')[1],
       },
     });
   }
@@ -136,7 +136,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(new URL(`/home${path === '/' ? '' : path}`, req.url), {
       headers: {
         'x-pathname': path,
-        'x-project': path.split('/')[1],
+        'x-workspace': path.split('/')[1],
       },
     });
   }
@@ -146,7 +146,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.rewrite(new URL(`/api${path}`, req.url), {
       headers: {
         'x-pathname': path,
-        'x-project': path.split('/')[1],
+        'x-workspace': path.split('/')[1],
       },
     });
   }
@@ -162,7 +162,7 @@ export default async function middleware(req: NextRequest) {
     {
       headers: {
         'x-pathname': path,
-        'x-project': hostname.split('.')[0],
+        'x-workspace': hostname.split('.')[0],
         'x-powered-by': 'Feedbase',
       },
     }

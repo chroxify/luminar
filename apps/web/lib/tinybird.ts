@@ -3,12 +3,12 @@ import { NextRequest, userAgent } from 'next/server';
 
 export async function recordClick({
   req,
-  projectId,
+  workspaceId,
   feedbackId,
   changelogId,
 }: {
   req: NextRequest;
-  projectId: string;
+  workspaceId: string;
   feedbackId?: string;
   changelogId?: string;
 }) {
@@ -36,7 +36,7 @@ export async function recordClick({
     },
     body: JSON.stringify({
       timestamp: new Date(Date.now()).toISOString(),
-      project: projectId,
+      workspace: workspaceId,
       sessionId: sessionId?.value || 'Unknown',
       changelogId: changelogId || '_root',
       feedbackId: feedbackId || '_root',

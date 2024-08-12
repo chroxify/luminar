@@ -1,7 +1,7 @@
 
 SCHEMA >
     `timestamp` DateTime64(3) `json:$.timestamp`,
-    `project` String `json:$.project`,
+    `workspace` String `json:$.workspace`,
     `changelogId` String `json:$.changelogId`,
     `feedbackId` String `json:$.feedbackId`,
     `sessionId` String `json:$.sessionId`,
@@ -28,4 +28,4 @@ SCHEMA >
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
-ENGINE_SORTING_KEY "project, timestamp, feedbackId, changelogId"
+ENGINE_SORTING_KEY "workspace, timestamp, feedbackId, changelogId"

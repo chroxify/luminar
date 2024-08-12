@@ -2,9 +2,16 @@ import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@feedbase/ui/components/card';
 import { createServerClient } from '@supabase/ssr';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 'ui/components/ui/card';
-import { UserAuthForm } from '@/components/user-auth-form';
+import { UserAuthForm } from '@/components/shared/user-auth-form';
 
 export const metadata: Metadata = {
   title: 'Sign in to Feedbase',
@@ -31,7 +38,7 @@ export default async function SignIn() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If there is a session, redirect to projects
+  // If there is a session, redirect to workspaces
   if (user) {
     redirect('/');
   }

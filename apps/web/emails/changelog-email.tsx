@@ -18,13 +18,13 @@ import { formatRootUrl } from '@/lib/utils';
 
 interface ChangelogEmailProps {
   subId: string;
-  projectSlug: string;
+  workspaceSlug: string;
   changelog: {
     title: string;
     content: string;
     publish_date: string;
     summary: string;
-    image: string;
+    thumbnail: string;
     slug: string;
     author: {
       full_name: string;
@@ -33,7 +33,7 @@ interface ChangelogEmailProps {
   };
 }
 
-export default function ChangelogEmail({ subId, projectSlug, changelog }: ChangelogEmailProps) {
+export default function ChangelogEmail({ subId, workspaceSlug, changelog }: ChangelogEmailProps) {
   return (
     <Html>
       <Preview>{changelog.summary}</Preview>
@@ -46,7 +46,7 @@ export default function ChangelogEmail({ subId, projectSlug, changelog }: Change
 
             {/* Image */}
             <Img
-              src={changelog.image || ''}
+              src={changelog.thumbnail || ''}
               alt='Thumbnail'
               className='aspect-auto w-full rounded-lg object-cover object-center'
             />
@@ -82,7 +82,7 @@ export default function ChangelogEmail({ subId, projectSlug, changelog }: Change
                     href={`https://twitter.com/intent/tweet?text=Make sure to check out ${
                       changelog.title
                     } by ${changelog.author.full_name}!&url=${formatRootUrl(
-                      projectSlug,
+                      workspaceSlug,
                       `/changelog/${changelog.slug}`
                     )}`}
                     target='_blank'
@@ -95,7 +95,7 @@ export default function ChangelogEmail({ subId, projectSlug, changelog }: Change
 
             {/* Content as html */}
             <div
-              className='prose prose-p:font-light prose-zinc prose-headings:font-medium prose-headings:text-black/80 prose-strong:text-black/80 prose-strong:font-normal prose-code:text-black/70 prose-code:font-normal prose-blockquote:text-black/80 prose-blockquote:font-normal w-0 min-w-full font-normal text-black/70'
+              className='prose prose-zinc prose-headings:font-medium prose-headings:text-black/80 prose-strong:text-black/80 prose-strong:font-normal prose-code:text-black/70 prose-code:font-normal prose-blockquote:text-black/80 prose-blockquote:font-normal w-0 min-w-full font-normal text-black/70'
               dangerouslySetInnerHTML={{ __html: changelog.content }}
             />
 
@@ -104,14 +104,14 @@ export default function ChangelogEmail({ subId, projectSlug, changelog }: Change
 
             <div className='flex w-full flex-row items-center justify-center gap-5 py-4'>
               <Link
-                href={formatRootUrl(projectSlug, `/changelog/unsubscribe?subId=${subId}`)}
-                className='flex items-center gap-2 text-sm font-light text-black/70 underline'>
+                href={formatRootUrl(workspaceSlug, `/changelog/unsubscribe?subId=${subId}`)}
+                className='flex items-center gap-2 text-sm text-black/70 underline'>
                 Unsubscribe
               </Link>
               <span className='text-sm font-normal text-black/70'>•</span>
               <Link
-                href={formatRootUrl(projectSlug, `/changelog/${changelog.slug}`)}
-                className='flex items-center gap-2 text-sm font-light text-black/70 underline'>
+                href={formatRootUrl(workspaceSlug, `/changelog/${changelog.slug}`)}
+                className='flex items-center gap-2 text-sm text-black/70 underline'>
                 View in browser
               </Link>
             </div>

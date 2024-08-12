@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server';
-import { getProjectBySlug } from '@/lib/api/projects';
-import { getPublicProjectChangelogs } from '@/lib/api/public';
+import { getPublicWorkspaceChangelogs } from '@/lib/api/public';
+import { getWorkspaceBySlug } from '@/lib/api/workspace';
 
 /*
-    Generate atom feed for project changelog
+    Generate atom feed for workspace changelog
 */
 export async function GET(req: Request, context: { params: { slug: string } }) {
-  // Get project data
-  const { data: project, error } = await getProjectBySlug(context.params.slug, 'route', true, false);
+  // Get workspace data
+  const { data: workspace, error } = await getWorkspaceBySlug(context.params.slug, 'route', true, false);
 
   // If any errors thrown, return error
   if (error) {
     return NextResponse.json({ error: error.message }, { status: error.status });
   }
 
-  const { data: changelogs, error: changelogError } = await getPublicProjectChangelogs(
+  const { data: changelogs, error: changelogError } = await getPublicWorkspaceChangelogs(
     context.params.slug,
     'route',
     true,
@@ -30,12 +30,12 @@ export async function GET(req: Request, context: { params: { slug: string } }) {
   return new Response(
     `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>${project.name} Changelog</title>
-    <subtitle>${project.name}'s Changelog</subtitle>
+    <title>${workspace.name} Changelog</title>
+    <subtitle>${workspace.name}'s Changelog</subtitle>
     <link href="${req.url}" rel="self"/>
     <link href="${process.env.NEXT_PUBLIC_ROOT_DOMAIN}"/>
     <updated>${changelogs[0].publish_date}</updated>
-    <id>${project.id}</id>${changelogs
+    <id>${workspace.id}</id>${changelogs
       .map((post) => {
         return `
     <entry>

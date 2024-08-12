@@ -3,7 +3,7 @@ import { recordClick } from '@/lib/tinybird';
 
 /*
   Record page view
-  POST /api/v1/[project]/views
+  POST /api/v1/[workspace]/views
   {
     "feedbackId": "string",
     "changelogId": "string",
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, context: { params: { slug: string }
 
   const data = await recordClick({
     req,
-    projectId: context.params.slug,
+    workspaceId: context.params.slug,
     feedbackId,
     changelogId,
   });

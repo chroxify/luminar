@@ -1,4 +1,5 @@
-import { withProjectAuth } from '@/lib/auth';
+import { PostgrestError } from '@supabase/supabase-js';
+import { withWorkspaceAuth } from '@/lib/auth';
 import {
   ChangelogSubscriberProps,
   ChangelogWithAuthorProps,
@@ -6,48 +7,34 @@ import {
   FeedbackWithUserProps,
 } from '@/lib/types';
 
-// Get Public Project Changelogs
-export const getPublicProjectChangelogs = withProjectAuth<ChangelogWithAuthorProps[]>(
-  async (user, supabase, project, error) => {
+// Get Public Workspace Changelogs
+export const getPublicWorkspaceChangelogs = withWorkspaceAuth<ChangelogWithAuthorProps[]>(
+  async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
     }
 
     // Get Changelogs
-    const { data: changelogs, error: changelogsError } = await supabase
-      .from('changelogs')
-      .select('profiles (full_name, avatar_url), *')
-      .eq('project_id', project!.id)
-      .eq('published', true);
+    const { data: changelogs, error: changelogsError } = (await supabase
+      .from('changelog')
+      .select('author:profile (full_name, avatar_url), *')
+      .eq('workspace_id', workspace!.id)
+      .eq('published', true)) as { data: ChangelogWithAuthorProps[]; error: PostgrestError | null };
 
     // Check for errors
     if (changelogsError) {
       return { data: null, error: { message: changelogsError.message, status: 500 } };
     }
 
-    // Restructure data
-    const restructuredData = changelogs.map((changelog) => {
-      // Destructure profiles from changelog
-      const { profiles, ...restOfChangelog } = changelog;
-
-      return {
-        ...restOfChangelog,
-        author: {
-          full_name: changelog.profiles?.full_name,
-          avatar_url: changelog.profiles?.avatar_url,
-        },
-      };
-    }) as ChangelogWithAuthorProps[];
-
     // Return changelogs
-    return { data: restructuredData, error: null };
+    return { data: changelogs, error: null };
   }
 );
 
-// Get Public Project Feedback
-export const getPublicProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>(
-  async (user, supabase, project, error) => {
+// Get Public Workspace Feedback
+export const getPublicWorkspaceFeedback = withWorkspaceAuth<FeedbackWithUserProps[]>(
+  async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -56,8 +43,8 @@ export const getPublicProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>
     // Get feedback and also include complete user object
     const { data: feedback, error: feedbackError } = await supabase
       .from('feedback')
-      .select('*, user:user_id (*)')
-      .eq('project_id', project!.id);
+      .select('*, user:profile (avatar_url, full_name)')
+      .eq('workspace_id', workspace!.id);
 
     // Check for errors
     if (feedbackError) {
@@ -74,9 +61,9 @@ export const getPublicProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>
 
     // Get team members
     const { data: teamMembers, error: teamMembersError } = await supabase
-      .from('project_members')
-      .select('profiles (full_name, avatar_url), *')
-      .eq('project_id', project!.id);
+      .from('workspace_member')
+      .select('profile (full_name, avatar_url), *')
+      .eq('workspace_id', workspace!.id);
 
     // Check for errors
     if (teamMembersError) {
@@ -92,7 +79,7 @@ export const getPublicProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>
     if (user) {
       // Get upvoters
       const { data: userUpvotes, error: userUpvotesError } = await supabase
-        .from('feedback_upvoters')
+        .from('feedback_upvoter')
         .select()
         .eq('profile_id', user.id);
 
@@ -117,9 +104,9 @@ export const getPublicProjectFeedback = withProjectAuth<FeedbackWithUserProps[]>
   }
 );
 
-// Subscribe to project changelogs
-export const subscribeToProjectChangelogs = (projectSlug: string, email: string) =>
-  withProjectAuth<ChangelogSubscriberProps['Row']>(async (user, supabase, project, error) => {
+// Subscribe to workspace changelogs
+export const subscribeToWorkspaceChangelogs = (workspaceSlug: string, email: string) =>
+  withWorkspaceAuth<ChangelogSubscriberProps['Row']>(async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -130,23 +117,23 @@ export const subscribeToProjectChangelogs = (projectSlug: string, email: string)
       return { data: null, error: { message: 'Invalid email.', status: 400 } };
     }
 
-    // Check if subscriber already exists for this project
+    // Check if subscriber already exists for this workspace
     const { data: existingSubscriber } = await supabase
-      .from('changelog_subscribers')
+      .from('changelog_subscriber')
       .select()
-      .eq('project_id', project!.id)
+      .eq('workspace_id', workspace!.id)
       .eq('email', email)
       .single();
 
     // If subscriber already exists, return error
     if (existingSubscriber) {
-      return { data: null, error: { message: 'You are already subscribed to this project.', status: 400 } };
+      return { data: null, error: { message: 'You are already subscribed to this workspace.', status: 400 } };
     }
 
-    // Subscribe to project changelogs
+    // Subscribe to workspace changelogs
     const { data: subscriber, error: subscriberError } = await supabase
-      .from('changelog_subscribers')
-      .insert({ project_id: project!.id, email })
+      .from('changelog_subscriber')
+      .insert({ workspace_id: workspace!.id, email })
       .select()
       .single();
 
@@ -157,11 +144,11 @@ export const subscribeToProjectChangelogs = (projectSlug: string, email: string)
 
     // Return subscriber
     return { data: subscriber, error: null };
-  })(projectSlug, 'server', true, false);
+  })(workspaceSlug, 'server', true, false);
 
-// Unsubscribe from project changelogs
-export const unsubscribeFromProjectChangelogs = (projectSlug: string, subId: string) =>
-  withProjectAuth<ChangelogWithAuthorProps[]>(async (user, supabase, project, error) => {
+// Unsubscribe from workspace changelogs
+export const unsubscribeFromWorkspaceChangelogs = (workspaceSlug: string, subId: string) =>
+  withWorkspaceAuth<ChangelogWithAuthorProps[]>(async (user, supabase, workspace, error) => {
     // If any errors, return error
     if (error) {
       return { data: null, error };
@@ -169,7 +156,7 @@ export const unsubscribeFromProjectChangelogs = (projectSlug: string, subId: str
 
     // Check if subscriber exists
     const { data: existingSubscriber } = await supabase
-      .from('changelog_subscribers')
+      .from('changelog_subscriber')
       .select()
       .eq('id', subId)
       .single();
@@ -181,7 +168,7 @@ export const unsubscribeFromProjectChangelogs = (projectSlug: string, subId: str
 
     // Delete subscriber
     const { data, error: deleteError } = await supabase
-      .from('changelog_subscribers')
+      .from('changelog_subscriber')
       .delete()
       .eq('id', subId)
       .single();
@@ -193,4 +180,4 @@ export const unsubscribeFromProjectChangelogs = (projectSlug: string, subId: str
 
     // Return success
     return { data, error: null };
-  })(projectSlug, 'server', true, false);
+  })(workspaceSlug, 'server', true, false);
